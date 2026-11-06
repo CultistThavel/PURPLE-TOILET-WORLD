@@ -1,0 +1,4059 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>PURPLE TOILET WORLD</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden;background:#000;font-family:"Trebuchet MS",Verdana,sans-serif;user-select:none;-webkit-user-select:none}
+.screen{position:fixed;inset:0;opacity:0;pointer-events:none;transition:opacity .8s ease;overflow:hidden}
+.screen.on{opacity:1;pointer-events:auto}
+canvas.bg{position:absolute;inset:0;width:100%;height:100%}
+#fade{position:fixed;inset:0;background:#000;z-index:200;opacity:0;pointer-events:none;transition:opacity .8s ease}
+#fade.on{opacity:1}
+.btn{background:#0a0a0a;color:#fff;border:1px solid #fff;font-family:inherit;font-weight:700;font-size:18px;letter-spacing:4px;text-transform:uppercase;cursor:pointer;transition:transform .12s,background .2s;position:relative;z-index:2;text-shadow:0 2px 0 #000;box-shadow:0 0 0 3px #0a0a0a,0 0 0 4px #fff}
+.btn:hover{background:#1c1c1c}
+.btn:active{transform:scale(.95)}
+.btn.wide{width:min(74vw,290px);height:66px;font-size:21px}
+.btn.blink{background:radial-gradient(ellipse at 50% 0%,#7dd3fc,#0369a1 60%,#0c2d57);text-shadow:0 2px 0 #0c2d57;animation:blinkB 1.1s infinite}
+@keyframes blinkB{0%,100%{box-shadow:0 0 0 3px #0a0a0a,0 0 0 4px #fff}50%{box-shadow:0 0 0 3px #0a0a0a,0 0 0 4px #fff,0 0 22px #7dd3fc}}
+
+#intro{background:#000}
+#warn{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:28px;text-align:center;color:#fff;font-size:clamp(17px,4.4vw,28px);font-weight:800;letter-spacing:1px;line-height:1.5;text-shadow:0 0 14px rgba(255,255,255,.55);opacity:0;transition:opacity 2s ease}
+#warn.on{opacity:1}
+
+#menu{background:#fff}
+.title{position:absolute;top:8%;left:0;right:0;text-align:center;line-height:1;z-index:2}
+.title .pt{display:block;color:#7c3aed;text-shadow:0 5px 0 #3b0764;letter-spacing:5px;font-size:clamp(34px,11vw,84px);font-weight:900}
+.title .wd{display:block;margin-top:10px;color:#22c55e;text-shadow:0 5px 0 #14532d;letter-spacing:12px;font-size:clamp(24px,7.5vw,58px);font-weight:900}
+.title::after{content:'1.0';position:absolute;right:12%;top:-6%;font-size:14px;font-weight:900;color:#000;background:#fff;border:2px solid #000;padding:2px 8px;transform:rotate(8deg)}
+.menubtns{position:absolute;left:50%;top:58%;transform:translateX(-50%);display:flex;flex-direction:column;gap:22px;align-items:center;z-index:2}
+
+.modal{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0);pointer-events:none;transition:background .5s ease;z-index:120}
+.modal.on{background:rgba(0,0,0,.5);pointer-events:auto}
+.box{width:min(88vw,420px);aspect-ratio:1/1;background:linear-gradient(160deg,#161220,#050309);border:1px solid #fff;box-shadow:0 0 0 4px #000,0 0 0 5px #fff;padding:26px 22px;color:#fff;position:relative;opacity:0;transform:scale(.96);transition:opacity .5s ease,transform .5s ease;display:flex;flex-direction:column;justify-content:center;gap:18px}
+.modal.on .box{opacity:1;transform:none}
+.logtitle{font-size:clamp(20px,5.5vw,28px);font-weight:900;text-shadow:0 0 12px #c4b5fd;padding-bottom:12px;border-bottom:1px solid #fff}
+.logtext{font-size:clamp(14px,3.8vw,17px);font-weight:700;line-height:1.5}
+.xbtn{position:absolute;top:12px;right:12px;width:46px;height:46px;background:#0a0a0a;border:1px solid #fff;color:#fff;font-size:26px;font-weight:900;cursor:pointer;z-index:5;box-shadow:0 0 0 3px #0a0a0a,0 0 0 4px #fff;line-height:1}
+
+#select{background:radial-gradient(ellipse at 70% 40%,#3b1d6e 0%,#140a2e 45%,#050309 100%)}
+.icons{position:absolute;top:18px;left:0;right:0;display:flex;justify-content:center;flex-wrap:wrap;gap:12px;z-index:2;padding:0 60px}
+.ico{width:clamp(60px,16vw,92px);height:clamp(60px,16vw,92px);object-fit:cover;border:2px solid #fff;cursor:pointer;background:#222;display:block;transition:transform .15s}
+.ico:hover{transform:translateY(-3px)}
+.ico.sel{border-color:#a78bfa;box-shadow:0 0 0 3px #000,0 0 0 5px #a78bfa}
+.ico.pop{animation:pop .35s}
+.ico.broken{background:#333}
+@keyframes pop{0%{transform:scale(1)}40%{transform:scale(.78)}100%{transform:scale(1)}}
+.side{position:absolute;right:4vw;top:52%;transform:translateY(-50%);width:min(88vw,330px);z-index:2}
+.card{position:relative;background:linear-gradient(180deg,rgba(20,12,40,.94),rgba(5,3,12,.95));border:1px solid #fff;box-shadow:0 0 0 4px #000,0 0 0 5px rgba(255,255,255,.6);padding:18px;color:#fff;text-align:center;width:100%}
+.card:empty{display:none}
+.pimg{width:100%;aspect-ratio:1/1;object-fit:cover;border:2px solid #fff;display:block;margin-bottom:10px;background:#111}
+.pimg.broken{background:#222}
+.pname{font-size:26px;font-weight:900;letter-spacing:1px;text-shadow:0 0 12px #c4b5fd}
+.pinfo{font-size:14px;margin:6px 0 10px;font-style:italic}
+.pl{font-size:15px;font-weight:700;margin:4px 0;color:#e9e5ff}
+.card .btn{margin-top:12px;width:100%;height:54px}
+
+#pvp{background:radial-gradient(ellipse at 50% 20%,#0f172a,#000 70%)}
+.pbox{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(92vw,560px);height:min(90vh,640px);border:1px solid #fff;background:linear-gradient(180deg,rgba(10,10,20,.9),rgba(0,0,0,.92));box-shadow:0 0 0 4px #000,0 0 0 5px #fff;padding:16px;display:flex;flex-direction:column;color:#fff;z-index:2}
+.pbox h2{text-align:center;font-size:clamp(20px,5.5vw,30px);font-weight:900;letter-spacing:3px;text-shadow:0 0 14px #a78bfa}
+.pbox .sub{text-align:center;font-size:16px;margin:8px 0 14px;font-weight:700}
+.eicons{display:flex;flex-wrap:wrap;gap:10px;align-self:flex-start;margin-bottom:12px}
+.eicons .ico{width:clamp(56px,14vw,70px);height:clamp(56px,14vw,70px)}
+.pbox .card{overflow:auto}
+.pbox .backbtn{margin-top:12px;align-self:center;width:160px;height:46px;font-size:15px}
+
+#arena{background:#555}
+#arena.quake{animation:quake .4s}
+@keyframes quake{0%,100%{transform:translate(0)}20%{transform:translate(-5px,3px)}40%{transform:translate(5px,-3px)}60%{transform:translate(-3px,2px)}80%{transform:translate(2px,-1px)}}
+#arena::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 45%,rgba(0,0,0,.7));pointer-events:none;z-index:4}
+.exit{position:absolute;top:14px;left:14px;width:48px;height:48px;background:#000;border:1px solid #fff;z-index:6;cursor:pointer;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:6px;box-shadow:0 0 0 3px #000,0 0 0 4px #fff}
+.exit i{display:block;width:24px;height:3px;background:#fff}
+.hpw{position:absolute;z-index:6;width:min(44vw,240px)}
+#hpL{left:14px;top:72px}
+#hpR{right:14px;top:14px}
+.hp{position:relative;height:34px;border:2px solid #fff;box-shadow:0 0 0 2px #000;background:#1a0000;overflow:hidden}
+.hp .f{position:absolute;left:0;top:0;bottom:0;background:linear-gradient(180deg,#ff5a5a,#d7191c 55%,#8b0000);transition:width .45s ease}
+.hp b{position:relative;display:block;line-height:30px;text-align:center;font-family:"Press Start 2P",monospace;font-size:9px;color:#fff;font-weight:400;text-shadow:1px 1px 0 #000}
+#pWrap,#eWrap{position:absolute;bottom:8%;width:min(40vw,260px);z-index:3}
+#pWrap{left:4vw}
+#eWrap{right:4vw}
+.aura{position:absolute;left:-18%;right:-18%;top:-8%;bottom:-4%;border-radius:50%;background:radial-gradient(circle,rgba(74,222,128,.6),rgba(74,222,128,0) 66%);opacity:0;pointer-events:none;z-index:0}
+.aura.p{background:radial-gradient(circle,rgba(168,85,247,.7),rgba(168,85,247,0) 66%)}
+.aura.on{animation:aura 1.2s ease-in-out infinite}
+@keyframes aura{0%,100%{opacity:.3;scale:.94}50%{opacity:.9;scale:1.06}}
+.fighter{display:block;width:100%;max-height:54vh;object-fit:contain;position:relative;z-index:1}
+@keyframes idle{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px) rotate(.4deg)}}
+.fighter.broken{background:#333;border:1px dashed #fff}
+#fE{scale:-1 1}
+.jit{animation:jit .4s}
+@keyframes jit{0%,100%{transform:translate(0,0) rotate(0)}25%{transform:translate(-8px,4px) rotate(-3deg)}50%{transform:translate(8px,-4px) rotate(3deg)}75%{transform:translate(-4px,2px)}}
+.lunge{animation:lunge .35s}
+@keyframes lunge{0%{transform:translateX(0)}40%{transform:translateX(30px)}100%{transform:translateX(0)}}
+.shake{animation:shake .3s}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-7px)}40%{transform:translateX(7px)}60%{transform:translateX(-4px)}80%{transform:translateX(3px)}}
+.tremble{animation:tremble .12s linear infinite}
+@keyframes tremble{0%,100%{transform:translate(0,0)}50%{transform:translate(-3px,1px)}}
+.hurt{animation:hurt .5s}
+@keyframes hurt{0%{transform:translate(0);filter:none}10%{transform:translate(-10px,0);filter:brightness(3.2) saturate(0)}25%{transform:translate(10px,0);filter:brightness(2) saturate(.3)}40%{transform:translate(-6px,0);filter:none}60%{transform:translate(4px,0)}100%{transform:translate(0);filter:none}}
+.greenBlink{animation:gblink .9s linear}
+@keyframes gblink{0%,100%{opacity:1}25%{opacity:.35}50%{opacity:1}75%{opacity:.35}}
+#ring{position:absolute;left:50%;bottom:-8px;width:170px;height:44px;transform:translateX(-50%);border:3px solid rgba(255,255,255,.9);border-radius:50%;box-shadow:0 0 16px rgba(255,255,255,.6);opacity:0;pointer-events:none;z-index:0}
+#ring.on{animation:ring .9s infinite}
+@keyframes ring{0%,100%{opacity:.2}50%{opacity:.95}}
+#abil{position:absolute;left:50%;top:-86px;transform:translateX(-50%);display:flex;gap:8px;z-index:7;pointer-events:none}
+.ab{width:98px;height:42px;border:2px solid #6b7280;background:linear-gradient(180deg,#f3f4f6,#c0c6cf 55%,#8b93a1);color:#111;font-family:inherit;font-weight:900;font-size:11px;letter-spacing:1px;cursor:pointer;box-shadow:0 0 0 2px #000,0 6px 14px rgba(0,0,0,.5);transform:scale(0);opacity:0;transition:transform .3s cubic-bezier(.2,1.6,.4,1),opacity .2s;white-space:nowrap}
+#abil.on{pointer-events:auto}
+#abil.on .ab{transform:scale(1);opacity:1}
+#abil.on .ab:nth-child(2){transition-delay:.08s}
+#abil.on .ab:nth-child(3){transition-delay:.16s}
+
+.xbtn.tl{left:14px;right:auto;top:14px}
+.wave2{position:fixed;left:0;top:0;width:120px;height:120px;margin:-60px 0 0 -60px;border-radius:50%;border:9px solid rgba(255,255,255,.95);box-shadow:0 0 22px rgba(255,255,255,.85),inset 0 0 12px rgba(255,255,255,.6);z-index:170;pointer-events:none;animation:ringGrow2 .5s linear forwards}
+@keyframes ringGrow2{from{scale:.3;opacity:1}to{scale:1.4;opacity:.2}}
+.spike{position:fixed;left:0;top:0;width:34px;height:30px;margin:-15px 0 0 -17px;background:radial-gradient(circle at 35% 30%,#f5f5f4,#78716c 65%);clip-path:polygon(50% 0%,62% 30%,100% 35%,70% 60%,80% 100%,50% 75%,20% 100%,30% 60%,0% 35%,38% 30%);z-index:170;pointer-events:none}
+.shard{position:fixed;left:0;top:0;width:7px;height:12px;margin:-6px 0 0 -3px;background:#e7e5e4;clip-path:polygon(50% 0,100% 100%,0 100%);z-index:172;pointer-events:none}
+.xbtn.tl{left:14px;right:auto;top:14px}
+#whiteFlash{position:fixed;inset:0;background:#fff;opacity:0;z-index:176;pointer-events:none}
+#whiteFlash.go{animation:wflash 2.6s ease-in-out forwards}
+@keyframes wflash{0%{opacity:0}6%{opacity:1}75%{opacity:1}100%{opacity:0}}
+#cosmic{position:absolute;left:18%;right:-34%;top:-6%;bottom:6%;border-radius:50%;background:radial-gradient(circle,rgba(0,0,0,.95),rgba(10,10,10,.6) 45%,rgba(0,0,0,0) 72%);opacity:0;transition:opacity .4s ease;pointer-events:none;z-index:2}
+#cosmic.on{opacity:1;animation:cosmicDrift 1.2s ease-in-out infinite}
+@keyframes cosmicDrift{0%,100%{scale:.96}50%{scale:1.05}}
+.ray{position:fixed;left:0;top:0;height:2px;margin-top:-1px;transform-origin:0 50%;background:linear-gradient(90deg,rgba(255,255,255,0),#fff,rgba(255,255,255,0));box-shadow:0 0 8px #fff;z-index:171;pointer-events:none}
+.dsmoke{position:fixed;left:0;top:0;border-radius:50%;background:radial-gradient(circle,rgba(20,20,20,.9),rgba(0,0,0,0) 70%);z-index:166;pointer-events:none}
+.shock{position:fixed;left:0;top:0;width:20px;height:20px;border-radius:50%;border:3px solid rgba(255,255,255,.9);z-index:169;pointer-events:none}
+.ripple{position:fixed;left:0;top:0;width:120px;height:120px;border-radius:50%;border:2px solid rgba(186,230,253,.9);box-shadow:0 0 16px rgba(125,211,252,.7);z-index:169;pointer-events:none}
+.glitchShake{animation:glitchShake .09s linear infinite}
+@keyframes glitchShake{0%,100%{transform:translate(0,0)}25%{transform:translate(-5px,2px) skewX(3deg)}50%{transform:translate(5px,-2px)}75%{transform:translate(-2px,-1px) skewX(-2deg)}}
+.glitchOut{animation:glitchOut .4s steps(4) forwards}
+@keyframes glitchOut{0%{opacity:1;transform:translateX(0)}25%{opacity:.2;transform:translateX(-18px) skewX(10deg)}50%{opacity:.8;transform:translateX(14px)}75%{opacity:.1;transform:translateX(-8px) skewX(-8deg)}100%{opacity:0}}
+.glitchIn{animation:glitchIn .4s steps(4) forwards}
+@keyframes glitchIn{0%{opacity:0;transform:translateX(12px)}40%{opacity:1;transform:translateX(-10px) skewX(6deg)}100%{opacity:1;transform:none}}
+.gone{visibility:hidden}
+.glitchSlice{position:fixed;left:0;top:0;background:rgba(56,189,248,.85);box-shadow:0 0 10px #38bdf8;z-index:177;pointer-events:none;animation:sliceFlick .25s steps(3) forwards}
+@keyframes sliceFlick{0%{opacity:1}50%{opacity:.2}100%{opacity:0}}
+.aura.r{background:radial-gradient(circle,rgba(239,68,68,.75),rgba(249,115,22,0) 66%)}
+.rocket{position:fixed;left:0;top:0;width:26px;height:9px;margin:-4.5px 0 0 -13px;border-radius:6px;background:linear-gradient(90deg,#fde68a,#f97316 60%,#7f1d1d);box-shadow:0 0 12px #f97316,0 0 6px #fde047;z-index:170;pointer-events:none;animation:rocketBlink .14s steps(2) infinite}
+@keyframes rocketBlink{0%{opacity:1}50%{opacity:.5}}
+.fire{position:fixed;left:0;top:0;width:8px;height:8px;margin:-4px 0 0 -4px;border-radius:50%;background:#fb923c;box-shadow:0 0 8px #f97316;z-index:168;pointer-events:none}
+.acid{position:fixed;left:0;top:0;width:18px;height:12px;margin:-6px 0 0 -9px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#d9f99d,#65a30d 60%,#365314);box-shadow:0 0 14px #84cc16,0 0 6px #bef264;z-index:170;pointer-events:none}
+.acidDrop{position:fixed;left:0;top:0;width:6px;height:8px;margin:-3px 0 0 -3px;border-radius:50%;background:#84cc16;box-shadow:0 0 6px #65a30d;z-index:168;pointer-events:none}
+#pWrap,#eWrap{animation:idle 3.2s ease-in-out infinite}
+#abil .ab{width:min(21vw,88px)}
+#abil.on .ab:nth-child(4){transition-delay:.24s}
+.slashX{position:fixed;left:0;top:0;width:min(95vw,780px);height:14px;background:linear-gradient(90deg,rgba(255,255,255,0),#fff 35%,#fff 65%,rgba(255,255,255,0));clip-path:polygon(0 50%,8% 0,92% 0,100% 50%,92% 100%,8% 100%);filter:drop-shadow(0 0 4px #ff1744) drop-shadow(0 0 12px #ff1744);z-index:178;pointer-events:none;animation:slashIn .5s ease-out forwards}
+@keyframes slashIn{0%{scale:.1 1;opacity:0}25%{opacity:1}100%{scale:1 1;opacity:0}}
+.rspark{position:fixed;left:0;top:0;width:5px;height:5px;margin:-2px 0 0 -2px;border-radius:50%;background:#ff1744;box-shadow:0 0 8px #ff1744,0 0 3px #fff;z-index:172;pointer-events:none}
+.rdust{position:fixed;left:0;top:0;border-radius:50%;background:radial-gradient(circle,rgba(220,38,38,.85),rgba(127,29,29,0) 70%);z-index:175;pointer-events:none}
+.rwave{position:fixed;left:0;top:0;width:70px;height:70px;margin:-35px 0 0 -35px;border-radius:50%;border:2px solid rgba(255,23,68,.9);box-shadow:0 0 14px #ff1744;z-index:170;pointer-events:none}
+.rsteam{position:fixed;left:0;top:0;border-radius:50%;background:radial-gradient(circle,rgba(255,23,68,.55),rgba(255,23,68,0) 70%);z-index:165;pointer-events:none}
+.note{position:fixed;left:0;top:0;color:#ff4d6d;font-size:24px;font-weight:900;text-shadow:0 0 8px #ff1744;pointer-events:none;z-index:179}
+.aura.red{background:radial-gradient(circle,rgba(255,23,68,.8),rgba(127,29,29,0) 66%)}
+.slashX2{position:fixed;left:0;top:0;width:min(95vw,780px);height:4px;background:linear-gradient(90deg,rgba(255,255,255,0),#fff 40%,#fff 60%,rgba(255,255,255,0));box-shadow:0 0 6px #fff;z-index:179;pointer-events:none;animation:slashIn .42s ease-out .04s forwards}
+.slashRed{position:fixed;left:0;top:0;width:min(100vw,860px);height:40px;background:radial-gradient(ellipse,rgba(255,23,68,.75),rgba(255,23,68,0) 70%);z-index:177;pointer-events:none;animation:slashIn .6s ease-out forwards}
+.blade{position:fixed;left:0;top:0;width:58px;height:10px;margin:-5px 0 0 -29px;border-radius:2px 60% 60% 2px;background:linear-gradient(90deg,rgba(255,255,255,0),#fff 30%,#f1f5f9 70%,rgba(255,255,255,0));filter:drop-shadow(0 0 3px #ff1744) drop-shadow(0 0 8px #ff1744);z-index:174;pointer-events:none}
+.sharpRing{position:fixed;left:0;top:0;width:90px;height:90px;margin:-45px 0 0 -45px;border-radius:50%;border:1px dashed #fff;box-shadow:0 0 0 1px rgba(255,23,68,.8),0 0 16px #ff1744;z-index:170;pointer-events:none}
+.mote{position:fixed;left:0;top:0;border-radius:50%;background:rgba(255,255,255,.7);box-shadow:0 0 6px rgba(255,255,255,.8);z-index:150;pointer-events:none}
+#pWrap::after,#eWrap::after{content:'';position:absolute;left:12%;right:12%;bottom:-3%;height:12%;background:radial-gradient(ellipse,rgba(0,0,0,.65),transparent 70%);z-index:-1;pointer-events:none}
+#arena::before{content:'';position:absolute;inset:0;background:radial-gradient(rgba(255,255,255,.07) 1px,transparent 1.5px) 0 0/4px 4px;pointer-events:none;z-index:3}
+
+/* ===== EnergizedTvHare: фиолетово-чёрные эффекты ===== */
+.aura.z{background:radial-gradient(circle,rgba(168,85,247,.85),rgba(40,8,70,.55) 45%,rgba(0,0,0,0) 68%)}
+.zspark{position:fixed;left:0;top:0;width:6px;height:16px;margin:-8px 0 0 -3px;background:linear-gradient(180deg,#fff,#c084fc 45%,#2e1065);clip-path:polygon(50% 0,100% 100%,0 100%);filter:drop-shadow(0 0 4px #a855f7);z-index:172;pointer-events:none}
+.zdot{position:fixed;left:0;top:0;width:7px;height:7px;margin:-3px 0 0 -3px;border-radius:50%;background:radial-gradient(circle,#fff,#c084fc 55%,#6b21a8);box-shadow:0 0 10px #a855f7,0 0 4px #fff;z-index:172;pointer-events:none}
+.zbolt{position:fixed;left:0;top:0;width:12px;height:44px;margin:-22px 0 0 -6px;background:linear-gradient(180deg,#fff,#d8b4fe 50%,#7e22ce);clip-path:polygon(60% 0,15% 52%,48% 52%,30% 100%,90% 40%,55% 40%);filter:drop-shadow(0 0 5px #a855f7);z-index:173;pointer-events:none}
+.zsmoke{position:fixed;left:0;top:0;border-radius:50%;background:radial-gradient(circle,rgba(30,8,52,.92),rgba(10,0,20,.55) 45%,rgba(0,0,0,0) 72%);z-index:166;pointer-events:none}
+.zsmoke2{position:fixed;left:0;top:0;border-radius:50%;background:radial-gradient(circle,rgba(168,85,247,.5),rgba(76,29,149,.25) 50%,rgba(0,0,0,0) 72%);z-index:165;pointer-events:none}
+.zfire{position:fixed;left:0;top:0;width:12px;height:16px;margin:-8px 0 0 -6px;border-radius:50% 50% 50% 50%/65% 65% 35% 35%;background:radial-gradient(circle at 50% 70%,#fff,#c084fc 40%,#581c87 80%);box-shadow:0 0 10px #a855f7;z-index:168;pointer-events:none}
+.zray{position:fixed;left:0;top:0;height:3px;margin-top:-1.5px;transform-origin:0 50%;background:linear-gradient(90deg,rgba(168,85,247,0),#fff 20%,#c084fc 60%,rgba(168,85,247,0));box-shadow:0 0 10px #a855f7;z-index:171;pointer-events:none}
+.burnrock{position:fixed;left:0;top:0;width:18px;height:16px;margin:-8px 0 0 -9px;border-radius:42% 58% 50% 50%;background:radial-gradient(circle at 35% 30%,#78350f,#1c1917 70%);box-shadow:0 0 8px #f97316,0 0 3px #fde047;z-index:170;pointer-events:none}
+.slashPg{position:fixed;left:0;top:0;width:min(105vw,900px);height:46px;background:radial-gradient(ellipse,rgba(168,85,247,.85),rgba(20,0,40,.55) 45%,rgba(0,0,0,0) 72%);z-index:177;pointer-events:none;animation:slashIn .7s ease-out forwards}
+.slashP{position:fixed;left:0;top:0;width:min(98vw,820px);height:20px;background:linear-gradient(90deg,rgba(255,255,255,0),#e9d5ff 25%,#fff 50%,#e9d5ff 75%,rgba(255,255,255,0));clip-path:polygon(0 50%,8% 0,92% 0,100% 50%,92% 100%,8% 100%);filter:drop-shadow(0 0 5px #a855f7) drop-shadow(0 0 16px #7e22ce);z-index:178;pointer-events:none;animation:slashIn .56s ease-out forwards}
+.slashP2{position:fixed;left:0;top:0;width:min(98vw,820px);height:5px;background:linear-gradient(90deg,rgba(0,0,0,0),#fff 40%,#fff 60%,rgba(0,0,0,0));box-shadow:0 0 8px #c084fc;z-index:179;pointer-events:none;animation:slashIn .46s ease-out .04s forwards}
+.slashPb{position:fixed;left:0;top:0;width:min(98vw,820px);height:10px;background:linear-gradient(90deg,rgba(0,0,0,0),#000 30%,#000 70%,rgba(0,0,0,0));z-index:177;pointer-events:none;animation:slashIn .5s ease-out forwards}
+.saw{position:fixed;left:0;top:0;width:130px;height:130px;margin:-65px 0 0 -65px;background:radial-gradient(circle,#e9d5ff 0 6%,#0a0a0a 7% 55%,#3b0764 56% 70%,#111 71% 100%);filter:drop-shadow(0 0 8px #a855f7) drop-shadow(0 0 3px #fff);z-index:174;pointer-events:none}
+.zbeam{position:fixed;left:0;top:0;height:46px;margin-top:-23px;transform-origin:0 50%;border-radius:23px;background:linear-gradient(180deg,rgba(126,34,206,0),rgba(168,85,247,.6) 28%,rgba(255,255,255,.98) 50%,rgba(168,85,247,.6) 72%,rgba(126,34,206,0));filter:drop-shadow(0 0 10px #a855f7) drop-shadow(0 0 24px #6b21a8);z-index:171;pointer-events:none;animation:zbeamPulse .08s linear infinite alternate}
+@keyframes zbeamPulse{from{opacity:.78;scale:1 .8}to{opacity:1;scale:1 1.12}}
+#abil.on .ab.locked{opacity:.55;filter:grayscale(.6);white-space:pre-line;font-size:9px;line-height:1.15}
+
+/* FX */
+.smoke{position:fixed;border-radius:50%;background:radial-gradient(circle,rgba(210,210,210,.85),rgba(120,120,120,0) 70%);z-index:180;pointer-events:none;animation:smoke .8s ease-out forwards}
+@keyframes smoke{from{transform:scale(.4);opacity:.9}to{transform:scale(1.8);opacity:0}}
+.puff{position:fixed;left:0;top:0;border-radius:50%;background:radial-gradient(circle,rgba(190,185,175,.9),rgba(140,135,125,0) 70%);z-index:175;pointer-events:none}
+.stone{position:fixed;left:0;top:0;width:24px;height:22px;margin:-11px 0 0 -12px;border-radius:42% 58% 50% 50%;background:radial-gradient(circle at 35% 30%,#e0ddd6,#6b6862 70%);box-shadow:0 2px 4px rgba(0,0,0,.4);z-index:170;pointer-events:none}
+.pebble{position:fixed;left:0;top:0;width:9px;height:8px;border-radius:40%;background:#c8c4bb;z-index:170;pointer-events:none}
+.wave{position:fixed;left:0;top:0;width:90px;height:90px;margin:-45px 0 0 -45px;border-radius:50%;border:2px solid rgba(255,255,255,.9);box-shadow:0 0 12px rgba(180,230,255,.7);z-index:170;pointer-events:none;animation:ringGrow .42s linear forwards}
+@keyframes ringGrow{from{scale:.25;opacity:.95}to{scale:1.5;opacity:0}}
+.pwave{position:fixed;left:0;top:0;width:80px;height:80px;border-radius:50%;border:2px solid rgba(192,132,252,.85);box-shadow:0 0 14px rgba(168,85,247,.6);background:radial-gradient(circle,rgba(168,85,247,0) 55%,rgba(168,85,247,.25) 70%,rgba(168,85,247,0) 72%);z-index:168;pointer-events:none}
+.knife{position:fixed;left:0;top:0;width:64px;height:10px;margin:-5px 0 0 -32px;border-radius:3px 8px 8px 3px;background:linear-gradient(90deg,#f5f5f5,#9ca3af 60%,#4b5563);box-shadow:0 0 14px rgba(168,85,247,.9);z-index:170;pointer-events:none}
+.bullet{position:fixed;left:0;top:0;width:18px;height:5px;margin:-2.5px 0 0 -9px;border-radius:3px;background:linear-gradient(90deg,#fff7a1,#facc15);box-shadow:0 0 10px #facc15,0 0 4px #fff;z-index:170;pointer-events:none}
+.beam{position:fixed;height:3px;margin-top:-1.5px;background:linear-gradient(90deg,#fffbd0,#fde047 50%,#facc15);box-shadow:0 0 10px #facc15,0 0 4px #fff;z-index:171;pointer-events:none;transform-origin:0 50%;animation:flick .12s infinite alternate}
+@keyframes flick{from{opacity:.7}to{opacity:1}}
+.spark{position:fixed;left:0;top:0;width:5px;height:5px;margin:-2px 0 0 -2px;border-radius:50%;background:#fde047;box-shadow:0 0 6px #facc15;z-index:172;pointer-events:none}
+.trail{position:fixed;left:0;top:0;width:6px;height:6px;margin:-3px 0 0 -3px;border-radius:50%;background:rgba(200,200,200,.6);z-index:168;pointer-events:none}
+.ptrail{position:fixed;left:0;top:0;width:6px;height:6px;margin:-3px 0 0 -3px;border-radius:50%;background:#c084fc;box-shadow:0 0 8px #a855f7;z-index:168;pointer-events:none}
+.drop{position:fixed;left:0;top:0;width:9px;height:12px;margin:-6px 0 0 -4px;border-radius:50% 50% 50% 50%/60% 60% 40% 40%;background:radial-gradient(circle at 40% 35%,#e9d5ff,#a855f7 60%,#6b21a8);z-index:170;pointer-events:none}
+.steam{position:fixed;left:0;top:0;border-radius:50%;background:radial-gradient(circle,rgba(134,239,172,.75),rgba(74,222,128,0) 70%);z-index:165;pointer-events:none}
+.flash{position:fixed;left:0;top:0;width:70px;height:70px;margin:-35px 0 0 -35px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.95),rgba(255,255,255,0) 65%);z-index:176;pointer-events:none;animation:flashGrow .25s ease-out forwards}
+.flash.p{background:radial-gradient(circle,rgba(233,213,255,.95),rgba(168,85,247,0) 65%)}
+@keyframes flashGrow{from{scale:.3;opacity:1}to{scale:1.6;opacity:0}}
+#purpleFlash{position:fixed;inset:0;background:#7e22ce;opacity:0;z-index:175;pointer-events:none}
+#purpleFlash.go{animation:pflash .4s ease-out}
+@keyframes pflash{0%{opacity:0}15%{opacity:.92}100%{opacity:0}}
+.dmg{position:fixed;font-weight:900;font-size:28px;color:#fff;text-shadow:0 0 8px #000,0 3px 0 #000;pointer-events:none;z-index:190;transform:translateX(-50%);animation:dmgUp 3s ease-out forwards;white-space:nowrap}
+@keyframes dmgUp{0%{opacity:0;margin-top:14px;scale:.6}10%{opacity:1;scale:1.15}20%{scale:1}75%{opacity:1}100%{opacity:0;margin-top:-70px}}
+#result{position:absolute;inset:0;display:none;align-items:center;justify-content:center;flex-direction:column;gap:18px;background:radial-gradient(ellipse at center,rgba(20,10,40,.7),rgba(0,0,0,.85));z-index:20;color:#fff}
+#result.on{display:flex}
+#resTxt{font-size:clamp(26px,8vw,44px);font-weight:900;letter-spacing:3px;text-shadow:0 0 12px #fff}
+</style>
+</head>
+<body>
+
+<div id="fade"></div>
+<div id="purpleFlash"></div>
+<div id="whiteFlash"></div>
+
+<div id="intro" class="screen on">
+  <div id="warn">Предупреждение - Игра в тестировании, поэтому не надо ожидать чего-то крутого. Нажмите на экран, чтобы продолжить.</div>
+</div>
+
+<div id="menu" class="screen">
+  <canvas class="bg" id="ballsCv"></canvas>
+  <h1 class="title"><span class="pt">PURPLE TOILET</span><span class="wd">WORLD</span></h1>
+  <div class="menubtns">
+    <button class="btn wide" id="btnStart">Стартуем</button>
+    <button class="btn wide" id="btnLogs">Логи</button>
+  </div>
+</div>
+
+<div id="logs" class="modal">
+  <div class="box">
+    <button class="xbtn" id="xLogs">×</button>
+    <div class="logtitle">1.0 - Purple Toilet World</div>
+    <div class="logtext">БУКВАЛЬНО ПЕРВАЯ ВЕРСИЯ ИГРЫ! ОЖИДАЙТЕ БОЛЬШЕ ОБНОВЛЕНИЙ!</div>
+  </div>
+</div>
+
+<div id="select" class="screen">
+  <div class="icons" id="charIcons"></div>
+  <div class="side"><div class="card" id="charCard"></div></div>
+  <button class="xbtn tl" id="selClose">×</button>
+</div>
+
+<div id="pvp" class="screen">
+  <canvas class="bg" id="snowCv"></canvas>
+  <button class="xbtn tl" id="pvpClose">×</button>
+  <div class="pbox">
+    <h2>ПВП - СТАРТ</h2>
+    <p class="sub">Выберите вашего врага.</p>
+    <div class="eicons" id="enemyIcons"></div>
+    <div class="card" id="enemyCard"></div>
+    <button class="btn backbtn" id="backSel">Назад</button>
+  </div>
+</div>
+
+<div id="arena" class="screen">
+  <canvas class="bg" id="brickCv"></canvas>
+  <button class="exit" id="exitBtn"><i></i><i></i><i></i></button>
+  <div class="hpw" id="hpL"><div class="hp"><div class="f" id="hpPf"></div><b id="hpPt"></b></div></div>
+  <div class="hpw" id="hpR"><div class="hp"><div class="f" id="hpEf"></div><b id="hpEt"></b></div></div>
+  <div id="pWrap">
+    <div class="aura" id="aura"></div>
+    <div id="cosmic"></div>
+    <img class="fighter" id="fP" alt="">
+    <div id="ring"></div>
+    <div id="abil">
+      <button class="ab" data-ab="A1">A1</button>
+      <button class="ab" data-ab="A2">A2</button>
+      <button class="ab" data-ab="A3">A3</button>
+      <button class="ab" data-ab="A4">A4</button>
+    </div>
+  </div>
+  <div id="eWrap">
+    <div class="aura" id="eaura"></div>
+    <img class="fighter" id="fE" alt="">
+  </div>
+  <div id="result"><div id="resTxt"></div><button class="btn wide" id="resOk">Ок</button></div>
+</div>
+
+<script>
+const A = {
+  menu: "https://www.dropbox.com/scl/fi/0n20ezeih3ziak7vfjxjb/videoplayback.mp3?rlkey=vy6d8tvc8vhldyyx7dw5o5ly5&st=gdh4o8oa&dl=1",
+  pvp:  "https://www.dropbox.com/scl/fi/c32w366wl6ztjthnc7h8u/04-Adventure-Ahead.mp3?rlkey=86b2ijmgo47ep4wnjxq9prsgy&st=1v80zt7r&dl=1",
+  psModel: "https://www.dropbox.com/scl/fi/4w1pyx0id590tt3y154s6/Picsart_26-11-02_19-21-38-699.png?rlkey=kt45dojak73jmcjl3o5nsr6p2&st=jnwsn9x4&dl=1",
+  psSound: "https://www.dropbox.com/scl/fi/ytqko8cn7vlr841sbilix/lv_0_20261104003027.mp3?rlkey=isnhyk49n2omy79a97w68deng&st=xemo6yo6&dl=1",
+  chars: {
+    CameraHare: {
+      icon:"https://www.dropbox.com/scl/fi/zqihy1uf6dinlrbbd5vmn/Picsart_26-11-03_22-59-08-215.jpg?rlkey=k9mea78c900xg2a8tv7vielum&st=ejmgoi9n&dl=1",
+      model:"https://www.dropbox.com/scl/fi/qpzoreppvx4r5h5tittkb/IMG_20261102_191452_197.png?rlkey=ym35mtc2qk26becahcpuhront&st=9z40k326&dl=1",
+      info:"Вроде сильный, но при этом слаб.", abil:"Punch, Kick, Rock", hp:159, stars:"☆", cd:6000, abl:["Punch","Kick","Rock"], pun:[25,45], kk:[15,15] },
+    SpeakerHare: {
+      icon:"https://www.dropbox.com/scl/fi/km86apdcopjs3712yt34t/Picsart_26-11-03_18-22-44-260.jpg?rlkey=0pc8mxktoe392u356jqxyv578&st=3gq3dqyv&dl=1",
+      model:"https://www.dropbox.com/scl/fi/gsjmqdwtyx6bdxrsml8h8/IMG_20261102_191458_988.png?rlkey=sqtkk1z7626vpsy14u43lias9&st=eploi2jl&dl=1",
+      info:"Рофл язык.", abil:"Punch, SoundWave, SpeedBoost", hp:227, stars:"☆", cd:6000, abl:["Punch","SoundWave","SpeedBoost"], pun:[25,45] },
+    TvHare: {
+      icon:"https://www.dropbox.com/scl/fi/0iubze6gq0zrbff6n5dq1/Picsart_26-11-03_18-20-31-134.jpg?rlkey=vjbzioec68fzs79wwzunhptme&st=y48wra43&dl=1",
+      model:"https://www.dropbox.com/scl/fi/whezxud14dsdyxhd4xf2y/Picsart_26-11-02_19-20-43-526.png?rlkey=qmfxzqy76bhjvlcam01coy7ji&st=31wlmwg7&dl=1",
+      info:"М-да, при первой же возможности бросают агентов.", abil:"PurpleScreen, Punch, Slash", hp:175, stars:"☆", cd:8000, abl:["PurpleScreen","Punch","Slash"], pun:[78,78] },
+    LargeCameraHare: {
+      icon:"https://www.dropbox.com/scl/fi/efijucpyt392cgg1vw9m0/Picsart_26-11-04_22-34-22-328.jpg?rlkey=ej6dqql8kt2ox30364eovn9tn&st=lr7gfi2e&dl=1",
+      model:"https://www.dropbox.com/scl/fi/5m61hrfppgz5ajlfjnni0/IMG_20261102_191454_486.png?rlkey=4aczbssk5gpeeo7m3ns97rdpj&st=pz15dt7f&dl=1",
+      info:"Крупный че-то слишком, смахивает на обычного зайца камеру.", abil:"Punch, Kick, Block", hp:450, stars:"☆", cd:6000, abl:["Punch","Kick","Block"], pun:[102,129], kk:[102,129] },
+    LargeSpeakerHare: { icon:'https://www.dropbox.com/scl/fi/dxyr1qnq1e6twnyvd0tgi/Picsart_26-11-05_00-46-07-389.png?rlkey=r7i57tkgwedjoc0mswtbwus39&st=rxbf5p60&dl=1', model:'https://www.dropbox.com/scl/fi/jhpqptplx31g899gbp4os/Picsart_26-11-05_00-43-22-726.png?rlkey=j5hdb3jdxa3o071wl6smkgpxt&st=c7jtoc3a&dl=1', info:'Нифига се, хороший союзник внатуре.', abil:'Crush, SoundWave V2, RocksV2', hp:650, stars:'☆☆', cd:9000, abl:['Crush','SoundWave V2','RocksV2'], pun:[150,221], swd:[170,238], rkd:[124,138] },
+    LargeTvHare: { icon:'https://www.dropbox.com/scl/fi/0aeyx2pmgx6hhkw3ka5u5/Picsart_26-11-05_22-55-29-097.png?rlkey=vrvahq0xm64x1lh4ppsd2hd54&st=useugtar&dl=1', model:'https://www.dropbox.com/scl/fi/pyfm6l7lcoqnbi56k3qvh/Picsart_26-11-05_18-11-39-157.png?rlkey=o1d4vg551zs8qgon7b17x7kuc&st=eln5u5mz&dl=1', bsModel:'https://www.dropbox.com/scl/fi/klv2o3rnjg0lln5jfc2aq/Picsart_26-11-05_18-13-18-728.png?rlkey=i1vy71voj9ou7fdm68klg7tio&st=szoo6p6s&dl=1', info:'Сильный парень, завораживает.', abil:'Crush, BlindScreen, Cosmic Block', hp:820, stars:'☆☆', cd:10000, abl:['Crush','BlindScreen','Cosmic Block'], pun:[141,189] },
+    DarkSpeakerHare: { icon:'https://www.dropbox.com/scl/fi/7uqcfehw0uwxrgpjghbyq/Picsart_26-11-06_01-13-05-949.png?rlkey=jo6xhaxxbb9boumx4prd9ded8&st=zeobt6r1&dl=1', model:'https://www.dropbox.com/scl/fi/0zjqlv2iyfh6o4pbs75oo/Picsart_26-11-06_00-10-46-108.png?rlkey=q84pl8lxz6xrp0kdz91av6t3u&st=94666azb&dl=1', info:'Хлоднокровный какой-то, всегда агрессивный.', abil:'SoundWave V3, Slash V2, SpeedBoost V2, Execution', hp:1250, stars:'☆☆☆', cd:12000, abl:['SoundWave V3','Slash V2','SpeedBoost V2','Execution'], pun:[25,45] },
+    EnergizedTvHare: { icon:'https://www.dropbox.com/scl/fi/xvyof4wkpiir945ybyzug/Picsart_26-11-06_16-22-31-263.jpg?rlkey=xoamyipfes5jxib0bykuixd6d&st=s9qjg3g9&dl=1', model:'https://www.dropbox.com/scl/fi/g85wkjc7poti4oapr6tyt/IMG_20261106_155318_520.png?rlkey=jtfad61s7cc27ivqmroc9m425&st=9j0174jt&dl=1', info:'Переряженный парень, не конфликтуй с ним.', abil:'Slash V3, EnergizedScreen, Submerge, Destruction', hp:1350, stars:'☆☆☆', cd:12000, abl:['Slash V3','EnergizedScreen','Submerge','Destruction'], pun:[25,45] }
+  },
+  enemies: {
+    PurpleToilet: {
+      icon:"https://www.dropbox.com/scl/fi/zspqtrkjhph131mjwuok7/Picsart_26-11-03_23-32-12-091.jpg?rlkey=n7938n5ucwwcr99ajc0wd315b&st=bcmmxxfw&dl=1",
+      model:"https://www.dropbox.com/scl/fi/z230rm506gr9j5cx0tycm/IMG_20261103_232858_585.png?rlkey=jc122davni5xzubu1m1k152qy&st=d4hagh2j&dl=1",
+      info:"А ведь из-за него всё это началось.", abil:"HeadButt", hp:225, stars:"☆", head:[13,13], headCd:5000 },
+    PolicePurpleToilet: {
+      icon:"https://www.dropbox.com/scl/fi/86ubhfl4kpj1lai2656l8/Picsart_26-11-03_23-36-44-989.jpg?rlkey=l3yz7s8cw7c4bah5j3v3lc1g8&st=mzehpvkw&dl=1",
+      model:"https://www.dropbox.com/scl/fi/trjjr1d9hb6u5qz36ok9j/IMG_20261103_232924_531.png?rlkey=m57qx8gheduixu0ddzy1s47iv&st=rxoigr52&dl=1",
+      info:"Ого, что-то новое.", abil:"HeadButt, Shoot", hp:422, stars:"☆", head:[13,13], headCd:5000, shoot:true },
+    PurpleMehaToilet: {
+      icon:"https://www.dropbox.com/scl/fi/9dnrgtqeb0kumdg2fmha7/Picsart_26-11-04_22-23-25-155.jpg?rlkey=9s2ki8kgszqjoemcd6m3z5zw8&st=8c8jzc44&dl=1",
+      model:"https://www.dropbox.com/scl/fi/otvafqj2ostis4ex8u5bd/IMG_20261104_222111_506.png?rlkey=2yn3amun7e0u5wh2itu0vqg5v&st=7bjse412&dl=1",
+      info:"Нифига, додумались всё таки", abil:"HeadButt, SpeedBoost", hp:422, stars:"☆☆", head:[35,56], headCd:5000, boost:true },
+    "PurpleToilet 1.5": {
+      icon:"https://www.dropbox.com/scl/fi/tb8f4lkk6lt4y3aysuuro/Picsart_26-11-04_22-26-58-034.jpg?rlkey=xw8wzvt97z9hwvbyy3vo98vkl&st=imium5b6&dl=1",
+      model:"https://www.dropbox.com/scl/fi/q4a54wxawdsiiim8mg7ty/Picsart_26-11-04_23-50-05-767.png?rlkey=9tfsoqrbfywd29n3fhb7nn5mo&st=a54wxawdsiiim8mg7ty&dl=1",
+      info:"А ведь серьёзно, выглядит грозно.", abil:"HeadButt, Lasers", hp:320, stars:"☆",     head:[65,78], headCd:6000, lasers:true },
+    "PurplePoliceToilet 2.0": { icon:'https://www.dropbox.com/scl/fi/x1m0hk9qyjkjiqa40m5nb/Picsart_26-11-05_23-44-50-587.jpg?rlkey=9705ef82w1je6jsbiux1oo7o8&st=cpmgvgnl&dl=1', model:'https://www.dropbox.com/scl/fi/l4ug5vfem0svws6rh6gxx/Picsart_26-11-05_23-41-16-764.png?rlkey=nkse8bhsq6igy7hsqeb9f2290&st=e32rblml&dl=1', info:'Хах, хороший аутфит.', abil:'HeadButt, Rockets, SpeedBoost V2', hp:623, stars:'☆☆☆', head:[101,130], headCd:5000, rockets:true, boostV2:true, boostHead:2000 },
+    "PurpleToilet 2.0": { icon:'https://www.dropbox.com/scl/fi/kq3hyifcmip08we41zvzx/Picsart_26-11-05_23-47-32-032.jpg?rlkey=ns1lrvalhovyebvykorhoixhw&st=c3urmaq8&dl=1', model:'https://www.dropbox.com/scl/fi/tf3hbi3hrm3d1641xnfo7/Picsart_26-11-05_23-38-49-943.png?rlkey=7tognvnsoiq9568t6iheul95o&st=woz0c7ab&dl=1', info:'С каждым разом выходят на новый уровень, стремно.', abil:'Acid Gun, HeadButt', hp:750, stars:'☆☆', head:[101,130], headCd:5000, acid:true },
+    PurpleGlitchToilet: { icon:'https://www.dropbox.com/scl/fi/9n39592sr0ofqgu6npojj/Picsart_26-11-05_23-21-19-635.jpg?rlkey=tyhywfjtpuvxwvey288p0qe8p&st=v51uqprh&dl=1', model:'https://www.dropbox.com/scl/fi/ij1wfvhckocrh6d0qv44y/Picsart_26-11-05_23-17-33-576.png?rlkey=w5lbpre7vw84qfev4u8ob50p4&st=bzdviury&dl=1', info:'¡¿Явялялветься ли он о-поаоссносьтью?٪@^≡"', abil:'Glitch Tech', hp:1250, stars:'☆☆☆', head:[0,0], headCd:3000, glitch:true }
+  }
+};
+
+const BEAM_SND = 'https://www.dropbox.com/scl/fi/oix8qtrr4uisv5a32chbw/large-tv-man-beam.mp3?rlkey=r4fw4mmieh31ngym1usoy7a9q&st=sx89oseo&dl=1';
+const TELE_SND = 'https://www.dropbox.com/scl/fi/ae7i93byttkdq4pqpvhyi/teleport-of-tvman.mp3?rlkey=kyyzs9bnwvzr57cf6plx8z8rx&st=yqv016xp&dl=1';
+const SAW_SND  = 'https://www.dropbox.com/scl/fi/p1nogupupqg44nfx9xgc1/astro-teleport-made-with-Voicemod.mp3?rlkey=gsqbuwssgx2vco2gn8agagpdw&st=hgivtbq1&dl=1';
+const $ = s => document.querySelector(s);
+const rnd = (a, b) => Math.floor(a + Math.random() * (b - a + 1));
+const sel = { char:null, enemy:null };
+let P, E, over = false, offerTimer = null, abilOpen = false, steamIv = null;
+let enemyTimeout = null, shootTimer = null, lasersTimer = null, boostTimer = null, rocketsTimer = null, acidTimer = null, glitchTimer = null, ambientIv = null;
+
+const psAudio = new Audio(A.psSound); psAudio.preload = 'auto';
+
+/* ===== SOUND ===== */
+let ac = null;
+function ctx(){
+  if(!ac) ac = new (window.AudioContext || window.webkitAudioContext)();
+  if(ac.state === 'suspended') ac.resume();
+  return ac;
+}
+function tone(f0, f1, dur, type, vol){
+  const c = ctx(), t = c.currentTime;
+  const o = c.createOscillator(), g = c.createGain();
+  o.type = type;
+  o.frequency.setValueAtTime(f0, t);
+  o.frequency.exponentialRampToValueAtTime(f1, t + dur);
+  g.gain.setValueAtTime(vol, t);
+  g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+  o.connect(g).connect(c.destination);
+  o.start(t); o.stop(t + dur + 0.02);
+}
+function noise(dur, vol, cutoff){
+  const c = ctx(), t = c.currentTime, len = Math.floor(c.sampleRate * dur);
+  const b = c.createBuffer(1, len, c.sampleRate), d = b.getChannelData(0);
+  for(let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / len);
+  const s = c.createBufferSource(); s.buffer = b;
+  const f = c.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = cutoff;
+  const g = c.createGain(); g.gain.value = vol;
+  s.connect(f).connect(g).connect(c.destination);
+  s.start(t);
+}
+const sfx = {
+  click(){ tone(1500, 600, 0.07, 'square', 0.12); },
+  punch(){ noise(0.12, 0.5, 1500); tone(220, 80, 0.12, 'triangle', 0.4); },
+  kick(){ noise(0.1, 0.6, 1200); tone(300, 60, 0.18, 'sine', 0.5); },
+  rock(){ noise(0.2, 0.4, 700); },
+  dust(){ noise(0.3, 0.45, 800); },
+  wave(){ tone(180, 900, 0.45, 'sine', 0.35); noise(0.35, 0.25, 2500); },
+  boost(){ tone(400, 1400, 0.35, 'triangle', 0.3); tone(600, 1800, 0.25, 'sine', 0.15); },
+  slash(){ noise(0.25, 0.5, 6000); tone(1200, 300, 0.22, 'sawtooth', 0.12); },
+  clink(){ tone(2400, 1800, 0.12, 'square', 0.15); noise(0.08, 0.3, 5000); },
+  gunshot(){ noise(0.09, 0.8, 6000); tone(900, 120, 0.14, 'square', 0.25); },
+  ricochet(){ tone(1800, 900, 0.08, 'square', 0.12); },
+  block(){ noise(0.15, 0.7, 2000); tone(500, 200, 0.12, 'square', 0.2); },
+  laserCharge(){ tone(300, 1400, 0.35, 'sawtooth', 0.1); },
+  zap(){ noise(0.05, 0.25, 6000); },
+  crush(){ tone(120, 40, 0.35, 'sine', 1.0); noise(0.3, 0.9, 1400); },
+  wave2(){ tone(150, 1400, 0.5, 'sawtooth', 0.35); noise(0.5, 0.6, 4000); },
+  rockV2(){ noise(0.25, 0.8, 900); tone(200, 70, 0.2, 'triangle', 0.5); },
+  rocket(){ noise(0.5, 0.5, 2500); tone(200, 600, 0.5, 'sawtooth', 0.15); },
+  explode(){ noise(0.7, 1.0, 700); tone(90, 25, 0.7, 'sine', 0.9); },
+  acid(){ noise(0.5, 0.35, 6000); tone(2000, 1400, 0.5, 'sawtooth', 0.05); },
+  acidSplash(){ noise(0.25, 0.5, 4000); tone(900, 300, 0.25, 'sine', 0.2); },
+  glitch(){ for(let i = 0; i < 6; i++) tone(200 + Math.random()*1200, 100 + Math.random()*800, 0.05, 'square', 0.15); noise(0.3, 0.4, 3000); },
+  redWave(){ tone(300, 1200, 0.5, 'sine', 0.3); tone(600, 900, 0.4, 'triangle', 0.2); },
+  redHit(){ noise(0.1, 0.5, 1500); },
+  slashV2(){ noise(0.15, 0.7, 8000); tone(1600, 400, 0.15, 'sawtooth', 0.15); },
+  slashHit(){ noise(0.2, 0.8, 3000); tone(300, 60, 0.25, 'sine', 0.7); },
+  darkBoost(){ tone(200, 800, 0.5, 'sawtooth', 0.2); tone(500, 1500, 0.4, 'triangle', 0.15); },
+  execution(){ noise(0.6, 1, 400); tone(60, 25, 0.8, 'sine', 1); },
+  blade(){ noise(0.12, 0.4, 9000); tone(2200, 900, 0.18, 'sawtooth', 0.12); },
+  bladeHit(){ noise(0.12, 0.6, 4000); tone(1400, 300, 0.1, 'square', 0.12); },
+  hit(){ tone(160, 35, 0.28, 'sine', 0.9); noise(0.18, 0.6, 900); },
+  /* EnergizedTvHare */
+  slashV3(){ noise(0.2, 0.8, 9000); tone(2000, 300, 0.2, 'sawtooth', 0.18); tone(900, 200, 0.25, 'square', 0.08); },
+  slashV3Hit(){ noise(0.25, 0.9, 3500); tone(320, 50, 0.3, 'sine', 0.8); tone(1800, 600, 0.12, 'square', 0.1); },
+  slashV3Fin(){ noise(0.5, 1, 2500); tone(180, 30, 0.6, 'sine', 1); tone(1200, 200, 0.4, 'sawtooth', 0.2); },
+  zapBig(){ noise(0.25, 0.6, 7000); tone(1600, 200, 0.25, 'sawtooth', 0.15); },
+  sawBreak(){ noise(0.45, 1, 3000); tone(220, 40, 0.45, 'sine', 1); tone(1500, 300, 0.3, 'square', 0.15); },
+  laserBuzz(dur){
+    const c = ctx(), t = c.currentTime;
+    const g = c.createGain();
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(0.3, t + 0.15);
+    g.gain.setValueAtTime(0.3, t + dur - 0.35);
+    g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+    const f = c.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = 2200;
+    g.connect(f).connect(c.destination);
+    [[85,'sawtooth'],[170,'square'],[43,'sawtooth']].forEach(([fr, ty]) => {
+      const o = c.createOscillator(); o.type = ty; o.frequency.value = fr;
+      const l = c.createOscillator(), lg = c.createGain();
+      l.frequency.value = 22; lg.gain.value = fr * 0.06;
+      l.connect(lg).connect(o.frequency);
+      l.start(t); l.stop(t + dur + 0.05);
+      o.connect(g); o.start(t); o.stop(t + dur + 0.05);
+    });
+    noise(Math.min(dur, 1.2), 0.5, 3500);
+  }
+};
+document.addEventListener('pointerdown', e => {
+  if(e.target.closest('button, .ico')) sfx.click();
+});
+
+/* ===== MUSIC ===== */
+const menuAudio = new Audio(A.menu); menuAudio.loop = true; menuAudio.volume = 0.7;
+const pvpAudio  = new Audio(A.pvp);  pvpAudio.loop = true;  pvpAudio.volume = 0.7;
+function playAudio(a){ a.volume = 0.7; a.play().catch(() => {}); }
+function fadeOutAudio(a, ms){
+  const from = a.volume, n = 20; let i = 0;
+  const iv = setInterval(() => {
+    i++; a.volume = Math.max(0, from * (1 - i / n));
+    if(i >= n){ clearInterval(iv); a.pause(); a.currentTime = 0; }
+  }, ms / n);
+}
+/* На телефоне звук надо «разбудить» жестом пользователя заранее */
+const SND = {};
+function loadSnd(name, url){
+  if(SND[name]) return;
+  fetch(url).then(r => r.arrayBuffer()).then(b => ctx().decodeAudioData(b)).then(buf => { SND[name] = buf; }).catch(() => {});
+}
+function playSnd(name, url, vol){
+  const buf = SND[name];
+  if(buf){
+    const c = ctx(), s = c.createBufferSource(), g = c.createGain();
+    s.buffer = buf; g.gain.value = vol || 1;
+    s.connect(g).connect(c.destination); s.start();
+  } else {
+    const a = new Audio(url); a.volume = Math.min(1, vol || 1); a.play().catch(() => {});
+  }
+}
+let psBuf = null;
+function loadPS(){
+  if(psBuf) return;
+  fetch(A.psSound).then(r => r.arrayBuffer()).then(b => ctx().decodeAudioData(b)).then(buf => { psBuf = buf; }).catch(() => {});
+}
+function playPS(){
+  if(psBuf){
+    const c = ctx(), s = c.createBufferSource(), g = c.createGain();
+    s.buffer = psBuf; g.gain.value = 1.3;
+    s.connect(g).connect(c.destination); s.start();
+  } else {
+    psAudio.currentTime = 0; psAudio.muted = false; psAudio.play().catch(() => {});
+  }
+}
+function unlockPS(){
+  psAudio.muted = true;
+  psAudio.play().then(() => { psAudio.pause(); psAudio.currentTime = 0; psAudio.muted = false; })
+    .catch(() => { psAudio.muted = false; });
+}
+
+/* ===== SCREENS ===== */
+const fade = $('#fade');
+function go(id, after){
+  fade.classList.add('on');
+  setTimeout(() => {
+    document.querySelectorAll('.screen').forEach(s => s.classList.toggle('on', s.id === id));
+    fade.classList.remove('on');
+    if(id === 'menu' && menuAudio.paused) playAudio(menuAudio);
+    if(after) after();
+  }, 800);
+}
+let introReady = false;
+setTimeout(() => { $('#warn').classList.add('on'); introReady = true; }, 3000);
+$('#intro').addEventListener('click', () => {
+  if(!introReady) return;
+  ctx(); unlockPS(); loadPS(); loadSnd('beam', BEAM_SND); loadSnd('tele', TELE_SND); loadSnd('saw', SAW_SND); playAudio(menuAudio); go('menu');
+});
+
+/* ===== BACKGROUNDS ===== */
+function visible(cv){ return cv.closest('.screen').classList.contains('on'); }
+function fit(cv){
+  const d = Math.min(window.devicePixelRatio || 1, 1.5);
+  cv.width = Math.round(cv.offsetWidth * d); cv.height = Math.round(cv.offsetHeight * d);
+  const g = cv.getContext('2d'); g.setTransform(d, 0, 0, d, 0, 0);
+  return { g, W: cv.offsetWidth, H: cv.offsetHeight };
+}
+function ballsBG(cv){
+  let s, B = [];
+  const cols = ['201,167,255','158,240,176','167,216,255','255,214,167'];
+  function rs(){ s = fit(cv); B = Array.from({length:12}, (_, i) => ({ x:Math.random()*s.W, y:Math.random()*s.H, r:24+Math.random()*44, vx:(Math.random()-0.5)*2, vy:(Math.random()-0.5)*2, c:cols[i%4] })); }
+  rs(); addEventListener('resize', rs);
+  (function loop(){
+    if(visible(cv)){
+      const { g, W, H } = s; g.clearRect(0,0,W,H);
+      for(const b of B){
+        b.vy += 0.05; b.x += b.vx; b.y += b.vy;
+        if(b.x < b.r){ b.x = b.r; b.vx *= -0.9; }
+        if(b.x > W-b.r){ b.x = W-b.r; b.vx *= -0.9; }
+        if(b.y > H-b.r){ b.y = H-b.r; b.vy *= -0.85; }
+        if(b.y < b.r){ b.y = b.r; b.vy *= -0.9; }
+        const gr = g.createRadialGradient(b.x, b.y, b.r*0.2, b.x, b.y, b.r);
+        gr.addColorStop(0, `rgba(${b.c},.75)`); gr.addColorStop(1, `rgba(${b.c},0)`);
+        g.fillStyle = gr; g.beginPath(); g.arc(b.x, b.y, b.r, 0, Math.PI*2); g.fill();
+      }
+    }
+    requestAnimationFrame(loop);
+  })();
+}
+function snowBG(cv){
+  let s, F = [], S = [];
+  function rs(){
+    s = fit(cv);
+    F = Array.from({length:70}, () => ({ x:Math.random()*s.W, y:Math.random()*s.H, r:1+Math.random()*2.5, vy:0.5+Math.random()*1.4, ph:Math.random()*6 }));
+    S = Array.from({length:8}, () => ({ x:Math.random()*s.W, y:Math.random()*s.H, l:80+Math.random()*140, v:6+Math.random()*9 }));
+  }
+  rs(); addEventListener('resize', rs);
+  (function loop(t){
+    if(visible(cv)){
+      const { g, W, H } = s; g.clearRect(0,0,W,H);
+      g.strokeStyle = 'rgba(255,255,255,.18)'; g.lineWidth = 2;
+      g.beginPath();
+      for(const w of S){
+        w.x += w.v; if(w.x > W + w.l){ w.x = -w.l; w.y = Math.random()*H; }
+        g.moveTo(w.x, w.y); g.lineTo(w.x - w.l, w.y + w.l*0.1);
+      }
+      g.stroke();
+      g.fillStyle = '#fff'; g.beginPath();
+      for(const f of F){
+        f.y += f.vy; f.x += Math.sin(t/800 + f.ph)*0.6 + 0.3;
+        if(f.y > H){ f.y = -5; f.x = Math.random()*W; }
+        g.moveTo(f.x + f.r, f.y); g.arc(f.x, f.y, f.r, 0, Math.PI*2);
+      }
+      g.fill();
+    }
+    requestAnimationFrame(loop);
+  })(0);
+}
+function bricksBG(cv){
+  function draw(){
+    const { g, W, H } = fit(cv);
+    const bw = 70, bh = 28;
+    g.fillStyle = '#6e6e6e'; g.fillRect(0,0,W,H);
+    for(let y = 0, row = 0; y < H; y += bh, row++){
+      for(let x = -(row%2)*bw/2; x < W; x += bw){
+        const s = Math.floor(90 + Math.random()*40);
+        g.fillStyle = `rgb(${s},${s},${s})`; g.fillRect(x+2, y+2, bw-4, bh-4);
+      }
+    }
+    for(let i = 0; i < 900; i++){
+      g.fillStyle = `rgba(0,0,0,${Math.random()*0.35})`;
+      g.fillRect(Math.random()*W, Math.random()*H, 2, 2);
+    }
+  }
+  draw(); addEventListener('resize', draw);
+}
+ballsBG($('#ballsCv')); snowBG($('#snowCv')); bricksBG($('#brickCv'));
+
+/* ===== MENU / SELECT ===== */
+$('#btnStart').onclick = () => go('select');
+$('#btnLogs').onclick = () => $('#logs').classList.add('on');
+$('#xLogs').onclick = () => $('#logs').classList.remove('on');
+$('#selClose').onclick = () => go('menu');
+
+function buildIcons(container, list, onPick){
+  container.innerHTML = '';
+  for(const key of Object.keys(list)){
+    const img = document.createElement('img');
+    img.src = list[key].icon; img.className = 'ico'; img.alt = key; img.title = key;
+    img.onerror = () => img.classList.add('broken');
+    img.onclick = () => {
+      img.classList.remove('pop'); void img.offsetWidth; img.classList.add('pop');
+      container.querySelectorAll('.ico').forEach(i => i.classList.toggle('sel', i === img));
+      onPick(key);
+    };
+    container.appendChild(img);
+  }
+}
+function renderCard(el, name, d, kind, btnText, onBtn){
+  const label = kind === 'char' ? 'Оценка Персонажа' : 'Оценка Опасности';
+  el.innerHTML = `
+    <img class="pimg" src="${d.icon}" alt="${name}" onerror="this.classList.add('broken')">
+    <div class="pname">${name}</div>
+    <div class="pinfo">${d.info}</div>
+    <div class="pl">${label}: ${d.stars}</div>
+    <div class="pl">Способности: ${d.abil}</div>
+    <div class="pl">Здоровье: ${d.hp} ХП</div>
+    <button class="xbtn cardX">×</button>
+    <button class="btn wide blink">${btnText}</button>`;
+  el.querySelector('button.blink').onclick = onBtn;
+  el.querySelector('.cardX').onclick = () => closeCard(el, kind);
+}
+buildIcons($('#charIcons'), A.chars, key => {
+  sel.char = key;
+  renderCard($('#charCard'), key, A.chars[key], 'char', 'Начать', () => {
+    go('pvp', () => {
+      sel.enemy = null; $('#enemyCard').innerHTML = '';
+      $('#enemyIcons').querySelectorAll('.ico').forEach(i => i.classList.remove('sel'));
+    });
+  });
+});
+buildIcons($('#enemyIcons'), A.enemies, key => {
+  sel.enemy = key;
+  renderCard($('#enemyCard'), key, A.enemies[key], 'enemy', 'СТАРТ', startFight);
+});
+$('#backSel').onclick = () => go('select');
+$('#pvpClose').onclick = () => go('menu');
+
+/* ===== FX HELPERS ===== */
+function center(el){ const r = el.getBoundingClientRect(); return { x:r.left+r.width/2, y:r.top+r.height/2, top:r.top }; }
+function restart(el, cls){ el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); }
+function bez(a, b, arc, t){
+  const mx = (a.x+b.x)/2, my = Math.min(a.y, b.y) - arc;
+  return { x:(1-t)*(1-t)*a.x + 2*(1-t)*t*mx + t*t*b.x, y:(1-t)*(1-t)*a.y + 2*(1-t)*t*my + t*t*b.y };
+}
+function particle(cls, x, y, dx = 0, dy = 0, dur = 500, size = null){
+  const d = document.createElement('div'); d.className = cls;
+  if(size){ d.style.width = d.style.height = size + 'px'; d.style.margin = (-size/2) + 'px 0 0 ' + (-size/2) + 'px'; }
+  d.style.left = x + 'px'; d.style.top = y + 'px';
+  document.body.appendChild(d);
+  d.animate([
+    { transform:'translate(0,0) scale(1)', opacity:0.95 },
+    { transform:`translate(${dx}px,${dy}px) scale(.3)`, opacity:0 }
+  ], { duration:dur, easing:'cubic-bezier(.2,.7,.4,1)', fill:'forwards' });
+  setTimeout(() => d.remove(), dur + 60);
+}
+function arcFly(cls, a, b, dur, arc, trailCls, onDone){
+  const el = document.createElement('div'); el.className = cls;
+  document.body.appendChild(el);
+  const kf = [];
+  for(let i = 0; i <= 12; i++){
+    const t = i/12, p = bez(a, b, arc, t), q = bez(a, b, arc, Math.min(1, t+0.02));
+    const ang = Math.atan2(q.y-p.y, q.x-p.x) * 180 / Math.PI;
+    kf.push({ transform:`translate(${p.x}px,${p.y}px) rotate(${ang}deg)`, offset:t });
+  }
+  el.animate(kf, { duration:dur, easing:'linear', fill:'forwards' }).onfinish = () => { el.remove(); if(onDone) onDone(); };
+  if(trailCls){
+    const t0 = performance.now();
+    const iv = setInterval(() => {
+      const t = Math.min(1, (performance.now() - t0) / dur), p = bez(a, b, arc, t);
+      particle(trailCls, p.x, p.y, rnd(-10,10), rnd(-10,10), 420);
+      if(t >= 1) clearInterval(iv);
+    }, 40);
+  }
+}
+function impactFx(el, kind){
+  const c = center(el);
+  particle('flash' + (kind === 'purple' ? ' p' : ''), c.x, c.y, 0, 0, 260, 70);
+  shockRing(c, kind === 'purple' ? 'rgba(192,132,252,.9)' : 'rgba(255,255,255,.9)');
+  emberBurst(c, kind);
+  setTimeout(() => shockRing(c, 'rgba(255,255,255,.35)'), 120);
+  dustBig(c, 10);
+  for(let i = 0; i < 7; i++){
+    const dx = rnd(-70, 70), dy = rnd(-60, 30);
+    if(kind === 'purple') particle('drop', c.x, c.y, dx, dy + 40, 620);
+    else if(kind === 'spark') particle('spark', c.x, c.y, dx, dy, 380);
+    else particle('pebble', c.x, c.y, dx, dy, 480);
+  }
+}
+function dustCloud(el, n){
+  const c = center(el);
+  for(let i = 0; i < n; i++){
+    particle('puff', c.x + rnd(-30,30), c.y + rnd(-30,30), rnd(-40,40), rnd(-40,-5), 700 + rnd(0,300), rnd(60,130));
+  }
+}
+function chargeFx(cls){
+  const c = center($('#fP'));
+  const col = cls.includes('ptrail') ? 'rgba(192,132,252,.9)' : cls.includes('steam') ? 'rgba(74,222,128,.9)' : cls.includes('spark') ? 'rgba(253,224,71,.9)' : 'rgba(255,255,255,.8)';
+  shockRing(c, col);
+  setTimeout(() => shockRing(c, col), 140);
+  particle('flash', c.x, c.y, 0, 0, 300, 120);
+  for(let i = 0; i < 14; i++){
+    const a = i/14 * Math.PI * 2, r = 70 + rnd(-10, 10);
+    particle(cls, c.x + Math.cos(a)*r, c.y + Math.sin(a)*r, -Math.cos(a)*rnd(20,50), -Math.sin(a)*rnd(20,50) - rnd(10,40), 500 + rnd(0,250));
+  }
+}
+function chargeFxLegacy(cls){
+  const c = center($('#fP'));
+  for(let i = 0; i < 6; i++){
+    const a = i/6 * Math.PI * 2;
+    particle(cls, c.x + Math.cos(a)*50, c.y + Math.sin(a)*50, Math.cos(a)*30, Math.sin(a)*30, 400);
+  }
+}
+function smokeAt(el, size){
+  const c = center(el), s = document.createElement('div');
+  s.className = 'smoke'; s.style.width = s.style.height = size + 'px';
+  s.style.left = (c.x - size/2) + 'px'; s.style.top = (c.y - size/2) + 'px';
+  document.body.appendChild(s); setTimeout(() => s.remove(), 850);
+}
+function floatText(el, text, color){
+  const c = center(el), d = document.createElement('div');
+  d.className = 'dmg'; d.textContent = text;
+  d.style.left = c.x + 'px'; d.style.top = (c.top + 10) + 'px';
+  if(color) d.style.color = color;
+  document.body.appendChild(d); setTimeout(() => d.remove(), 3000);
+}
+function setAura(el, mode){
+  el.classList.remove('on', 'p', 'red', 'z');
+  if(!mode) return;
+  if(mode === 'p') el.classList.add('p');
+  if(mode === 'red') el.classList.add('red');
+  if(mode === 'z') el.classList.add('z');
+  void el.offsetWidth; el.classList.add('on');
+}
+function updateBars(){
+  $('#hpPf').style.width = (P.hp/P.max*100) + '%'; $('#hpPt').textContent = P.hp + ' HP';
+  $('#hpEf').style.width = (E.hp/E.max*100) + '%'; $('#hpEt').textContent = E.hp + ' HP';
+}
+function endFight(){
+  over = true;
+  [enemyTimeout, offerTimer].forEach(clearTimeout);
+  [shootTimer, lasersTimer, boostTimer, steamIv, rocketsTimer, acidTimer, glitchTimer, ambientIv].forEach(clearInterval);
+  setAura($('#aura'), null); setAura($('#eaura'), null);
+  hideAbilities();
+}
+function checkEnd(){
+  if(over) return;
+  if(P.hp <= 0 || E.hp <= 0){
+    endFight();
+    $('#resTxt').textContent = P.hp <= 0 ? 'ПОРАЖЕНИЕ' : 'ПОБЕДА';
+    $('#result').classList.add('on');
+  }
+}
+function damageEnemy(dmg){
+  if(over) return;
+  E.hp = Math.max(0, E.hp - dmg);
+  restart($('#fE'), 'jit'); floatText($('#fE'), '-' + dmg);
+  updateBars(); checkEnd();
+}
+function damagePlayer(dmg, color){
+  if(over) return;
+  if(P.shieldUntil && Date.now() < P.shieldUntil){
+    sfx.block();
+    const c = center($('#fP'));
+    particle('flash', c.x, c.y, 0, 0, 240, 80);
+    floatText($('#fP'), 'BLOCK', '#ffffff');
+    return;
+  }
+  /* Submerge: каждая атака врага слабее на 10 урона */
+  if(P.submergeUntil && Date.now() < P.submergeUntil) dmg = Math.max(0, dmg - 10);
+  P.hp = Math.max(0, P.hp - dmg);
+  restart($('#fP'), 'hurt');
+  smokeAt($('#fP'), 150);
+  floatText($('#fP'), '-' + dmg, color || '#ff6b6b');
+  updateBars(); checkEnd();
+}
+function stunned(){ return !!(E && E.stunUntil && Date.now() < E.stunUntil); }
+
+/* ===== ENEMY AI ===== */
+function scheduleEnemy(delay){
+  E.due = Date.now() + delay;
+  clearTimeout(enemyTimeout);
+  enemyTimeout = setTimeout(enemyAttack, delay);
+}
+/* HeadButt: 600 мс замаха, за это время можно нажать Block */
+function enemyAttack(){
+  if(over || !E.d.head || E.d.glitch) return;
+  if(stunned()){ scheduleEnemy(E.stunUntil - Date.now() + 50); return; }
+  if(E.pauseUntil && Date.now() < E.pauseUntil){ scheduleEnemy(E.pauseUntil - Date.now() + 50); return; }
+  const dmg = rnd(E.d.head[0], E.d.head[1]);
+  const pend = { cancelled:false, landed:false };
+  E.pending = pend;
+  restart($('#fE'), 'jit');
+  scheduleEnemy(E.boosting ? (E.d.boostHead || 3000) : E.d.headCd);
+  setTimeout(() => {
+    pend.landed = true;
+    if(over || pend.cancelled) return;
+    sfx.hit();
+    if(E.d.head[0] >= 100) dustBig(center($('#fP')), 8);
+    damagePlayer(dmg);
+  }, 600);
+}
+function slowEnemy(ms){
+  if(over) return;
+  E.due += ms; clearTimeout(enemyTimeout);
+  enemyTimeout = setTimeout(enemyAttack, Math.max(0, E.due - Date.now()));
+}
+/* PolicePurpleToilet: выстрел раз в 8 секунд */
+function enemyShoot(){
+  if(over || stunned()) return;
+  restart($('#fE'), 'jit');
+  const from = center($('#fE')), to = center($('#fP'));
+  particle('flash', from.x - 40, from.y, 0, 0, 220, 60);
+  sfx.gunshot();
+  arcFly('bullet', from, to, 420, 14, 'spark', () => {
+    if(over) return;
+    sfx.ricochet();
+    impactFx($('#fP'), 'spark');
+    damagePlayer(45, '#fde047');
+  });
+}
+/* PurpleMehaToilet: SpeedBoost раз в 30 секунд, 8 секунд, атаки каждые 3 секунды */
+function enemyBoost(){
+  if(over || E.boosting || stunned()) return;
+  E.boosting = true;
+  sfx.boost();
+  setAura($('#eaura'), 'g');
+  clearInterval(steamIv);
+  steamIv = setInterval(() => {
+    if(over) return;
+    const c = center($('#fE'));
+    particle('steam', c.x + rnd(-50,50), c.y + rnd(-20,40), rnd(-14,14), -rnd(60,110), 1000 + rnd(0,400), rnd(22,50));
+  }, 130);
+  scheduleEnemy(3000);
+  setTimeout(() => {
+    E.boosting = false;
+    clearInterval(steamIv);
+    setAura($('#eaura'), null);
+  }, 8000);
+}
+/* PurpleToilet 1.5: два жёлтых лазера на 4 секунды, 15 урона каждые 700 мс */
+function enemyLasers(){
+  if(over || stunned()) return;
+  sfx.laserCharge();
+  restart($('#fE'), 'jit');
+  const from = center($('#fE'));
+  particle('flash', from.x, from.y, 0, 0, 260, 60);
+  setTimeout(() => {
+    if(over) return;
+    const to = center($('#fP'));
+    const beams = [-18, 18].map(off => makeBeam(from.x, from.y + off, to.x, to.y + off * 0.6));
+    const fp = $('#fP');
+    fp.classList.add('tremble');
+    let n = 0;
+    const iv = setInterval(() => {
+      if(over || ++n > 6){ clearInterval(iv); return; }
+      sfx.zap();
+      damagePlayer(15, '#fde047');
+      for(let i = 0; i < 3; i++) particle('spark', to.x + rnd(-30,30), to.y + rnd(-50,40), rnd(-40,40), rnd(-60,20), 350);
+    }, 700);
+    for(let i = 0; i < 10; i++) setTimeout(() => {
+      if(over) return;
+      const t = Math.random();
+      particle('puff', from.x + (to.x-from.x)*t, from.y + (to.y-from.y)*t + rnd(-20,20), rnd(-20,20), rnd(-40,-10), 600, rnd(40,80));
+    }, i * 380);
+    setTimeout(() => {
+      beams.forEach(b => b.remove());
+      fp.classList.remove('tremble');
+    }, 4000);
+  }, 350);
+}
+function makeBeam(x1, y1, x2, y2){
+  const d = document.createElement('div'); d.className = 'beam';
+  const len = Math.hypot(x2-x1, y2-y1), ang = Math.atan2(y2-y1, x2-x1) * 180 / Math.PI;
+  d.style.left = x1 + 'px'; d.style.top = y1 + 'px'; d.style.width = len + 'px';
+  d.style.transform = `rotate(${ang}deg)`;
+  document.body.appendChild(d);
+  return d;
+}
+
+/* ===== ABILITY OFFERS ===== */
+/* Кнопка Destruction заперта, пока не сделано 3 атаки */
+function updateLock(){
+  if(!P) return;
+  const b = $('#abil').querySelector('[data-ab="Destruction"]');
+  if(!b) return;
+  const lk = P.atk < 3;
+  b.classList.toggle('locked', lk);
+  b.textContent = lk ? ('Destruction\n' + P.atk + '/3') : 'Destruction';
+}
+function offerAbilities(){
+  if(over || abilOpen || (P.noAttackUntil && Date.now() < P.noAttackUntil)) return;
+  abilOpen = true;
+  updateLock();
+  $('#abil').classList.add('on'); $('#ring').classList.add('on');
+}
+function hideAbilities(){
+  abilOpen = false;
+  $('#abil').classList.remove('on'); $('#ring').classList.remove('on');
+}
+function scheduleOffer(){
+  clearTimeout(offerTimer);
+  const boosted = P && P.boostUntil > Date.now();
+  const cd = boosted ? (P.boostCd || 4000) : P.d.cd;
+  offerTimer = setTimeout(() => { offerAbilities(); scheduleOffer(); }, cd);
+}
+function useAbility(name){
+  if(!abilOpen || over) return;
+  if(name === 'Destruction' && P.atk < 3){
+    floatText($('#fP'), 'Нужно 3 атаки: ' + P.atk + '/3', '#c4b5fd');
+    return;
+  }
+  hideAbilities();
+  if(P.d.abl.indexOf('Destruction') >= 0){
+    if(name === 'Destruction') P.atk = 0; else P.atk++;
+  }
+  switch(name){
+    case 'Punch': return punch();
+    case 'Kick': return kick();
+    case 'Rock': return rock();
+    case 'Block': return block();
+    case 'Crush': return crush();
+    case 'SoundWave V2': return soundWaveV2();
+    case 'RocksV2': return rocksV2();
+    case 'BlindScreen': return blindScreen();
+    case 'Cosmic Block': return cosmicBlock();
+    case 'SoundWave': return soundWave();
+    case 'SpeedBoost': return speedBoost();
+    case 'PurpleScreen': return purpleScreen();
+    case 'Slash': return slash();
+    case 'SoundWave V3': return soundWaveV3();
+    case 'Slash V2': return slashV2();
+    case 'SpeedBoost V2': return speedBoostV2();
+    case 'Execution': return executionV2();
+    case 'Slash V3': return slashV3();
+    case 'EnergizedScreen': return energizedScreen();
+    case 'Submerge': return submerge();
+    case 'Destruction': return destruction();
+  }
+}
+
+/* Punch: у TvHare фиолетовый и мощный, у остальных искры */
+function punch(){
+  const purple = P.d === A.chars.TvHare;
+  chargeFx(purple ? 'ptrail' : 'spark');
+  restart($('#fP'), 'lunge');
+  setTimeout(() => {
+    if(over) return;
+    sfx.punch();
+    impactFx($('#fE'), purple ? 'purple' : 'spark');
+    const dmg = rnd(P.d.pun[0], P.d.pun[1]);
+    damageEnemy(dmg);
+    smokeAt($('#fE'), purple ? 200 : 90);
+    if(purple) dustCloud($('#fE'), 5);
+  }, 250);
+}
+/* Kick: замедляет атаку врага на 3 секунды */
+function kick(){
+  chargeFx('puff');
+  restart($('#fP'), 'lunge');
+  setTimeout(() => {
+    if(over) return;
+    sfx.kick(); impactFx($('#fE'), 'dust');
+    dustCloud($('#fE'), 2);
+    damageEnemy(rnd(P.d.kk[0], P.d.kk[1]));
+    slowEnemy(3000);
+    floatText($('#fE'), 'SLOW', '#7dd3fc');
+  }, 250);
+}
+function rock(){
+  chargeFx('trail');
+  const total = rnd(68, 98);
+  const parts = [Math.floor(total/3), Math.floor(total/3), total - 2*Math.floor(total/3)];
+  parts.forEach((dmg, i) => setTimeout(() => {
+    if(over) return;
+    sfx.rock();
+    arcFly('stone', center($('#fP')), center($('#fE')), 520, 120, 'trail', () => {
+      if(over) return;
+      sfx.dust(); dustCloud($('#fE'), 3); damageEnemy(dmg);
+    });
+  }, i * 160));
+}
+/* LargeCameraHare: Block. Если нажать во время замаха врага, удар отбит,
+   враг получает 20 урона (один раз за бой) и его следующая атака через 7 секунд */
+function block(){
+  restart($('#fP'), 'shake');
+  sfx.block();
+  chargeFx('spark');
+  const pend = E.pending;
+  if(pend && !pend.landed && !pend.cancelled){
+    pend.cancelled = true;
+    const c = center($('#fP'));
+    dustCloud($('#fP'), 4);
+    smokeAt($('#fP'), 170);
+    restart($('#fE'), 'jit');
+    scheduleEnemy(7000);
+    if(!P.blockDone){
+      P.blockDone = true;
+      floatText($('#fE'), 'BLOCK', '#fde047');
+      damageEnemy(20);
+    }
+  }
+}
+/* SpeakerHare: SoundWave */
+function soundWave(){
+  chargeFx('trail');
+  restart($('#fP'), 'shake');
+  sfx.wave();
+  setTimeout(() => {
+    if(over) return;
+    const a = center($('#fP')), b = center($('#fE'));
+    for(let i = 0; i < 3; i++) setTimeout(() => {
+      if(over) return;
+      const r = document.createElement('div'); r.className = 'wave';
+      r.style.left = a.x + 'px'; r.style.top = a.y + 'px';
+      document.body.appendChild(r);
+      r.animate([
+        { transform:'translate(0,0)' },
+        { transform:`translate(${b.x-a.x}px,${b.y-a.y}px)` }
+      ], { duration:420, easing:'linear', fill:'forwards' });
+      setTimeout(() => r.remove(), 460);
+    }, i * 90);
+    for(let i = 0; i < 4; i++) setTimeout(() => {
+      if(over) return;
+      arcFly('pebble', a, { x:b.x + rnd(-30,30), y:b.y + rnd(-30,30) }, 380, 60 + rnd(0,30), 'trail');
+    }, 40 + i * 50);
+    setTimeout(() => {
+      if(over) return;
+      restart($('#arena'), 'quake');
+      impactFx($('#fE'), 'dust');
+      dustCloud($('#fE'), 4);
+      damageEnemy(rnd(56, 77));
+    }, 420);
+  }, 200);
+}
+/* SpeakerHare: SpeedBoost */
+function speedBoost(){
+  P.boostUntil = Date.now() + 13000;
+  restart($('#fP'), 'greenBlink');
+  sfx.boost();
+  setAura($('#aura'), 'g');
+  chargeFx('steam');
+  clearInterval(steamIv);
+  steamIv = setInterval(() => {
+    if(over) return;
+    const c = center($('#fP'));
+    particle('steam', c.x + rnd(-50,50), c.y + rnd(-20,40), rnd(-14,14), -rnd(60,110), 1000 + rnd(0,400), rnd(22,50));
+  }, 130);
+  scheduleOffer();
+  setTimeout(() => {
+    if(over || P.boostUntil > Date.now()) return;
+    clearInterval(steamIv);
+    setAura($('#aura'), null);
+    scheduleOffer();
+  }, 13000);
+}
+/* TvHare: PurpleScreen — фиолетовые волны 6 секунд, звук, смена модели */
+function purpleScreen(){
+  const flash = $('#purpleFlash');
+  flash.classList.remove('go'); void flash.offsetWidth; flash.classList.add('go');
+  playPS();
+  setTimeout(() => {
+    if(over) return;
+    const fp = $('#fP');
+    fp.src = A.psModel;
+    restart(fp, 'shake');
+    fp.classList.add('tremble');
+    setAura($('#aura'), 'p');
+    scheduleEnemy(6000);
+    purpleWaves();
+    let n = 0;
+    const iv = setInterval(() => {
+      if(over || ++n > 8){ clearInterval(iv); return; }
+      damageEnemy(10);
+      restart($('#fE'), 'jit');
+    }, 700);
+    setTimeout(() => {
+      fp.classList.remove('tremble');
+      setAura($('#aura'), null);
+      if(!over) fp.src = P.d.model;
+    }, 6000);
+  }, 200);
+}
+function purpleWaves(){
+  let n = 0;
+  const iv = setInterval(() => {
+    if(over || ++n > 20){ clearInterval(iv); return; }
+    const c = center($('#fP'));
+    const w = document.createElement('div'); w.className = 'pwave';
+    w.style.left = (c.x + rnd(-20,20)) + 'px'; w.style.top = (c.y + rnd(-40,20)) + 'px';
+    document.body.appendChild(w);
+    w.animate([
+      { transform:'translate(-50%,-50%) scale(.2)', opacity:.85 },
+      { transform:'translate(-50%,-50%) scale(2.4)', opacity:0 }
+    ], { duration:900, easing:'ease-out', fill:'forwards' });
+    setTimeout(() => w.remove(), 950);
+    particle('puff', c.x + rnd(-60,60), c.y + rnd(-40,40), rnd(-30,30), rnd(-40,-10), 600, rnd(40,80));
+  }, 300);
+}
+/* TvHare: Slash */
+function slash(){
+  chargeFx('ptrail');
+  restart($('#fP'), 'shake');
+  sfx.slash();
+  const a = center($('#fP')), b = center($('#fE'));
+  arcFly('knife', a, b, 420, 30, 'ptrail', () => {
+    if(over) return;
+    sfx.clink();
+    impactFx($('#fE'), 'purple');
+    damageEnemy(rnd(88, 105));
+    smokeAt($('#fE'), 150);
+  });
+}
+
+/* LargeSpeakerHare: Crush — жёсткий удар, осколки, дым, громкий звук */
+function crush(){
+  chargeFx('spark');
+  restart($('#fP'), 'lunge');
+  setTimeout(() => {
+    if(over) return;
+    sfx.crush();
+    restart($('#arena'), 'quake');
+    const c = center($('#fE'));
+    impactFx($('#fE'), 'spark');
+    for(let i = 0; i < 10; i++) particle('shard', c.x + rnd(-40,40), c.y + rnd(-40,40), rnd(-80,80), rnd(-60,40), 600 + rnd(0,300));
+    dustCloud($('#fE'), 6);
+    smokeAt($('#fE'), 240);
+    damageEnemy(rnd(P.d.pun[0], P.d.pun[1]));
+  }, 250);
+}
+/* LargeSpeakerHare: SoundWave V2 — одна толстая белая волна */
+function soundWaveV2(){
+  chargeFx('trail');
+  restart($('#fP'), 'shake');
+  sfx.wave2();
+  sharpWaveFx();
+  setTimeout(() => {
+    if(over) return;
+    const a = center($('#fP')), b = center($('#fE'));
+    const r = document.createElement('div'); r.className = 'wave2';
+    r.style.left = a.x + 'px'; r.style.top = a.y + 'px';
+    document.body.appendChild(r);
+    r.animate([{ transform:'translate(0,0)' }, { transform:`translate(${b.x-a.x}px,${b.y-a.y}px)` }], { duration:480, easing:'linear', fill:'forwards' });
+    setTimeout(() => r.remove(), 520);
+    for(let i = 0; i < 6; i++) setTimeout(() => {
+      if(over) return;
+      arcFly('shard', a, { x:b.x + rnd(-40,40), y:b.y + rnd(-40,40) }, 420, 70 + rnd(0,40), 'trail');
+    }, 30 + i * 40);
+    setTimeout(() => {
+      if(over) return;
+      restart($('#arena'), 'quake');
+      impactFx($('#fE'), 'dust');
+      dustCloud($('#fE'), 5);
+      damageEnemy(rnd(P.d.swd[0], P.d.swd[1]));
+    }, 480);
+  }, 200);
+}
+/* LargeSpeakerHare: RocksV2 — два шипастых камня */
+function rocksV2(){
+  chargeFx('trail');
+  [0, 1].forEach(i => setTimeout(() => {
+    if(over) return;
+    sfx.rockV2();
+    arcFly('spike', center($('#fP')), center($('#fE')), 560, 130, 'trail', () => {
+      if(over) return;
+      sfx.dust();
+      dustCloud($('#fE'), 4);
+      smokeAt($('#fE'), 140);
+      const c = center($('#fE'));
+      for(let k = 0; k < 5; k++) particle('shard', c.x, c.y, rnd(-70,70), rnd(-60,30), 500);
+      damageEnemy(rnd(P.d.rkd[0], P.d.rkd[1]));
+    });
+  }, i * 200));
+}
+
+function ray(x1, y1, x2, y2, dur, cls){
+  const d = document.createElement('div'); d.className = cls || 'ray';
+  const len = Math.hypot(x2-x1, y2-y1), ang = Math.atan2(y2-y1, x2-x1) * 180 / Math.PI;
+  d.style.left = x1 + 'px'; d.style.top = y1 + 'px'; d.style.width = len + 'px';
+  d.style.transform = `rotate(${ang}deg)`;
+  document.body.appendChild(d);
+  d.animate([{ opacity:0 }, { opacity:1, offset:0.3 }, { opacity:0 }], { duration:dur, fill:'forwards' });
+  setTimeout(() => d.remove(), dur + 40);
+}
+/* LargeTvHare: BlindScreen — белая вспышка, смена облика, белые лучи и урон 10 каждые 500 мс в течение 8 секунд */
+function blindScreen(){
+  const w = $('#whiteFlash');
+  w.classList.remove('go'); void w.offsetWidth; w.classList.add('go');
+  playSnd('beam', BEAM_SND, 1.2);
+  setTimeout(() => {
+    if(over) return;
+    const fp = $('#fP');
+    fp.src = P.d.bsModel;
+    restart(fp, 'shake');
+    fp.classList.add('tremble');
+    const end = Date.now() + 8000;
+    let n = 0;
+    const rayIv = setInterval(() => {
+      if(over || Date.now() > end){ clearInterval(rayIv); return; }
+      const c = center(fp), e = center($('#fE'));
+      ray(c.x + rnd(-30,30), c.y + rnd(-50,30), e.x + rnd(-40,40), e.y + rnd(-40,40), 240);
+      if(Math.random() < 0.5){
+        particle('puff', e.x + rnd(-40,40), e.y + rnd(-40,40), rnd(-30,30), rnd(-40,-10), 500, rnd(40,90));
+      }
+    }, 170);
+    const dmgIv = setInterval(() => {
+      if(over || Date.now() > end){ clearInterval(dmgIv); return; }
+      damageEnemy(10);
+      if(n++ % 2 === 0) smokeAt($('#fE'), 130);
+    }, 500);
+    setTimeout(() => {
+      clearInterval(rayIv); clearInterval(dmgIv);
+      fp.classList.remove('tremble');
+      if(!over) fp.src = P.d.model;
+    }, 8000);
+  }, 2000);
+}
+/* LargeTvHare: Cosmic Block — чёрный дым и блок любой атаки на 5 секунд */
+function closeCard(el, kind){
+  el.innerHTML = '';
+  const icons = kind === 'char' ? $('#charIcons') : $('#enemyIcons');
+  icons.querySelectorAll('.ico').forEach(i => i.classList.remove('sel'));
+  if(kind === 'char') sel.char = null; else sel.enemy = null;
+}
+function shockRing(c, color){
+  const r = document.createElement('div'); r.className = 'shock';
+  r.style.left = c.x + 'px'; r.style.top = c.y + 'px';
+  r.style.borderColor = color;
+  document.body.appendChild(r);
+  r.animate([{ transform:'translate(-50%,-50%) scale(.5)', opacity:1 }, { transform:'translate(-50%,-50%) scale(4.5)', opacity:0 }], { duration:480, easing:'ease-out', fill:'forwards' });
+  setTimeout(() => r.remove(), 520);
+}
+function dustBig(c, n){
+  for(let i = 0; i < n; i++){
+    particle('puff', c.x + rnd(-60,60), c.y + rnd(-40,40), rnd(-70,70), rnd(-70,-10), 900 + rnd(0,400), rnd(70,160));
+  }
+}
+function shieldRipple(c){
+  const r = document.createElement('div'); r.className = 'ripple';
+  r.style.left = c.x + 'px'; r.style.top = c.y + 'px';
+  document.body.appendChild(r);
+  r.animate([{ transform:'translate(-50%,-50%) scale(.3)', opacity:.9 }, { transform:'translate(-50%,-50%) scale(2)', opacity:0 }], { duration:700, easing:'ease-out', fill:'forwards' });
+  setTimeout(() => r.remove(), 750);
+}
+/* LargeTvHare: Cosmic Block — чёрный дым клубится вокруг, искры и щит-рябь 5 секунд, блок любой атаки */
+function cosmicBlock(){
+  const cos = $('#cosmic'), fp = $('#fP');
+  sfx.block();
+  P.shieldUntil = Date.now() + 5000;
+  cos.classList.remove('on'); void cos.offsetWidth; cos.classList.add('on');
+  fp.classList.add('tremble');
+  const end = Date.now() + 5000;
+  const c0 = center(fp);
+  shieldRipple(c0);
+  dustBig(c0, 12);
+  const iv = setInterval(() => {
+    if(over || Date.now() > end){ clearInterval(iv); return; }
+    const c = center(fp);
+    for(let i = 0; i < 2; i++){
+      particle('dsmoke', c.x + rnd(-80,80), c.y + rnd(-70,50), rnd(-30,30), rnd(-60,-20), 900 + rnd(0,500), rnd(70,140));
+    }
+    particle('spark', c.x + rnd(-60,60), c.y + rnd(-60,40), rnd(-30,30), rnd(-40,20), 400);
+    if(Math.random() < 0.4) shieldRipple(c);
+  }, 260);
+  setTimeout(() => {
+    clearInterval(iv);
+    cos.classList.remove('on');
+    fp.classList.remove('tremble');
+  }, 5000);
+}
+function cosmicBlockLegacy(){
+  const cos = $('#cosmic'), fp = $('#fP');
+  sfx.block();
+  P.shieldUntil = Date.now() + 5000;
+  cos.classList.remove('on'); void cos.offsetWidth; cos.classList.add('on');
+  fp.classList.add('tremble');
+  const c = center(fp);
+  for(let i = 0; i < 8; i++){
+    particle('dsmoke', c.x + rnd(-60,60), c.y + rnd(-60,40), rnd(-40,40), rnd(-50,-10), 900 + rnd(0,400), rnd(60,120));
+  }
+  dustCloud(fp, 3);
+  setTimeout(() => {
+    cos.classList.remove('on');
+    fp.classList.remove('tremble');
+  }, 5000);
+}
+
+function enemyBoostV2(){
+  if(over || E.boosting || stunned()) return;
+  E.boosting = true;
+  sfx.boost();
+  setAura($('#eaura'), 'r');
+  clearInterval(steamIv);
+  steamIv = setInterval(() => {
+    if(over) return;
+    const c = center($('#fE'));
+    particle('fire', c.x + rnd(-50,50), c.y + rnd(-20,50), rnd(-20,20), -rnd(60,120), 700 + rnd(0,300), rnd(18,36));
+    particle('puff', c.x + rnd(-40,40), c.y + rnd(-20,30), rnd(-20,20), -rnd(40,90), 900, rnd(40,80));
+  }, 120);
+  scheduleEnemy(2000);
+  setTimeout(() => {
+    E.boosting = false;
+    clearInterval(steamIv);
+    setAura($('#eaura'), null);
+    E.pauseUntil = Date.now() + 15000;
+  }, 8000);
+}
+function explode(c, ring){
+  sfx.explode();
+  particle('flash', c.x, c.y, 0, 0, 380, 180);
+  shockRing(c, ring || 'rgba(251,146,60,.95)');
+  dustBig(c, 12);
+  for(let i = 0; i < 12; i++) particle('dsmoke', c.x + rnd(-60,60), c.y + rnd(-50,50), rnd(-80,80), rnd(-80,-10), 900 + rnd(0,500), rnd(80,150));
+  for(let i = 0; i < 14; i++) particle('spark', c.x + rnd(-10,10), c.y + rnd(-10,10), rnd(-120,120), rnd(-120,60), 500 + rnd(0,300));
+  restart($('#arena'), 'quake');
+}
+/* PolicePurpleToilet 2.0: две ракеты, перезарядка 28 секунд */
+function enemyRockets(){
+  if(over || stunned()) return;
+  E.rocketReady = Date.now() + 28000;
+  const from = center($('#fE')), to = center($('#fP'));
+  restart($('#fE'), 'jit');
+  [0, 1].forEach(i => setTimeout(() => {
+    if(over) return;
+    const f = { x: from.x + rnd(-10,10), y: from.y + (i ? 30 : -20) };
+    sfx.rocket();
+    particle('flash', f.x, f.y, 0, 0, 260, 90);
+    arcFly('rocket', f, { x: to.x + rnd(-30,30), y: to.y + rnd(-30,30) }, 620, 90, 'fire', () => {
+      if(over) return;
+      explode(to);
+      damagePlayer(rnd(212, 359), '#fb923c');
+    });
+  }, i * 260));
+}
+function dotPlayer(dmg){
+  if(over) return;
+  if(P.shieldUntil && Date.now() < P.shieldUntil) return;
+  P.hp = Math.max(0, P.hp - dmg);
+  updateBars(); checkEnd();
+}
+/* PurpleToilet 2.0: Acid Gun — 50 урона и яд 5 урона каждые 500 мс, 8 секунд, перезарядка 10 секунд после */
+function enemyAcid(){
+  if(over || stunned()) return;
+  E.acidReady = Date.now() + 18000;
+  restart($('#fE'), 'jit');
+  const from = center($('#fE')), to = center($('#fP'));
+  sfx.acid();
+  particle('puff', from.x - 30, from.y, 0, 0, 300, 90);
+  setTimeout(() => {
+    if(over) return;
+    arcFly('acid', from, to, 480, 40, 'acidDrop', () => {
+      if(over) return;
+      sfx.acidSplash();
+      for(let i = 0; i < 12; i++) particle('acidDrop', to.x + rnd(-40,40), to.y + rnd(-40,40), rnd(-60,60), rnd(20,90), 600 + rnd(0,300));
+      particle('flash', to.x, to.y, 0, 0, 260, 80);
+      damagePlayer(50, '#84cc16');
+      let n = 0;
+      const iv = setInterval(() => {
+        if(over || ++n > 16){ clearInterval(iv); return; }
+        dotPlayer(5);
+        const c = center($('#fP'));
+        particle('acidDrop', c.x + rnd(-30,30), c.y + rnd(-40,40), rnd(-10,10), rnd(20,60), 500);
+      }, 500);
+    });
+  }, 250);
+}
+function glitchSlice(c){
+  const d = document.createElement('div'); d.className = 'glitchSlice';
+  d.style.left = (c.x + rnd(-120,120)) + 'px'; d.style.top = (c.y + rnd(-140,120)) + 'px';
+  d.style.width = rnd(40,160) + 'px'; d.style.height = rnd(4,14) + 'px';
+  document.body.appendChild(d);
+  setTimeout(() => d.remove(), 300);
+}
+/* PurpleGlitchToilet: исчезает, бьёт 100 → 220 → 557 каждые 3 секунды */
+function enemyGlitch(){
+  if(over || stunned()) return;
+  const seq = [100, 220, 557];
+  const dmg = seq[(E.gi || 0) % 3];
+  E.gi = (E.gi || 0) + 1;
+  const fe = $('#fE');
+  restart(fe, 'glitchOut');
+  sfx.glitch();
+  setTimeout(() => {
+    if(over) return;
+    fe.classList.remove('glitchOut');
+    fe.classList.add('gone');
+    const c0 = center($('#fP'));
+    for(let i = 0; i < 8; i++) glitchSlice(c0);
+    setTimeout(() => {
+      if(over) return;
+      const to = center($('#fP'));
+      explode(to, 'rgba(56,189,248,.95)');
+      damagePlayer(dmg, '#38bdf8');
+      fe.classList.remove('gone');
+      restart(fe, 'glitchIn');
+      setTimeout(() => fe.classList.remove('glitchIn'), 420);
+    }, 350);
+  }, 400);
+}
+
+/* DarkSpeakerHare: SoundWave V3 — красные волны с нотами, 100 урона каждые 300 мс в течение 3 секунд */
+function notes(c, n, col){
+  for(let i = 0; i < n; i++){
+    const d = document.createElement('div'); d.className = 'note';
+    d.textContent = Math.random() < 0.5 ? '♪' : '♫';
+    if(col){ d.style.color = col; d.style.textShadow = '0 0 8px ' + col; }
+    d.style.left = (c.x + rnd(-60,60)) + 'px'; d.style.top = (c.y + rnd(-40,20)) + 'px';
+    document.body.appendChild(d);
+    d.animate([
+      { transform:'translate(-50%,0) scale(.7)', opacity:0 },
+      { opacity:1, offset:0.2 },
+      { transform:`translate(calc(-50% + ${rnd(-50,50)}px),-${rnd(80,140)}px) scale(1.1)`, opacity:0 }
+    ], { duration:1100 + rnd(0,400), easing:'ease-out', fill:'forwards' });
+    setTimeout(() => d.remove(), 1600);
+  }
+}
+function soundWaveV3(){
+  sfx.redWave();
+  restart($('#arena'), 'quake');
+  const fp = $('#fP');
+  fp.classList.add('tremble');
+  setTimeout(() => fp.classList.remove('tremble'), 3000);
+  let n = 0;
+  const iv = setInterval(() => {
+    if(over || ++n > 7){ clearInterval(iv); return; }
+    const a = center(fp), b = center($('#fE'));
+    const r = document.createElement('div'); r.className = 'rwave';
+    r.style.left = a.x + 'px'; r.style.top = a.y + 'px';
+    document.body.appendChild(r);
+    r.animate([{ transform:'translate(0,0)' }, { transform:`translate(${b.x-a.x}px,${b.y-a.y}px)` }], { duration:280, easing:'linear', fill:'forwards' });
+    setTimeout(() => r.remove(), 300);
+    notes(a, 2);
+    for(let i = 0; i < 4; i++) particle('rspark', b.x + rnd(-50,50), b.y + rnd(-60,60), rnd(-60,60), rnd(-60,40), 380);
+    sfx.redHit();
+    damageEnemy(50);
+  }, 450);
+}
+/* DarkSpeakerHare: Slash V2 — два неоновых пореза на врага, 357–389 и 478–577 урона */
+function slashLineLegacy(c, angle, idx){
+  if(over) return;
+  const s = document.createElement('div'); s.className = 'slashX';
+  s.style.left = c.x + 'px'; s.style.top = c.y + 'px';
+  s.style.transform = `translate(-50%,-50%) rotate(${angle}deg)`;
+  document.body.appendChild(s);
+  setTimeout(() => s.remove(), 520);
+  sfx.slashHit();
+  restart($('#fE'), 'jit');
+  for(let i = 0; i < 12; i++) particle('rspark', c.x + rnd(-80,80), c.y + rnd(-60,60), rnd(-120,120), rnd(-120,60), 500);
+  for(let i = 0; i < 8; i++) particle('rdust', c.x + rnd(-90,90), c.y + rnd(-60,60), rnd(-80,80), rnd(-60,30), 800 + rnd(0,300), rnd(50,110));
+  smokeAt($('#fE'), 170);
+  notes(c, 4);
+  damageEnemy(idx === 0 ? rnd(357, 389) : rnd(478, 577));
+}
+function slashV2(){
+  restart($('#fP'), 'lunge');
+  sfx.slashV2();
+  setTimeout(() => {
+    if(over) return;
+    const c = center($('#fE'));
+    slashLine(c, -28, 0);
+    setTimeout(() => { if(!over){ sfx.slashV2(); slashLine(c, 22, 1); } }, 180);
+  }, 200);
+}
+/* DarkSpeakerHare: SpeedBoost V2 — красная аура, искры и ноты, атака каждые 2 секунды 6 секунд, затем 5 секунд без атаки */
+function speedBoostV2Legacy(){
+  P.boostCd = 2000;
+  P.boostUntil = Date.now() + 6000;
+  P.noAttackUntil = Date.now() + 11000;
+  restart($('#fP'), 'greenBlink');
+  sfx.darkBoost();
+  setAura($('#aura'), 'red');
+  notes(center($('#fP')), 6);
+  const iv = setInterval(() => {
+    if(over || Date.now() > P.boostUntil){ clearInterval(iv); return; }
+    const c = center($('#fP'));
+    particle('rsteam', c.x + rnd(-50,50), c.y + rnd(-20,40), rnd(-14,14), -rnd(60,110), 900 + rnd(0,400), rnd(22,50));
+    particle('rspark', c.x + rnd(-60,60), c.y + rnd(-60,40), rnd(-30,30), rnd(-50,20), 400);
+    if(Math.random() < 0.3) notes(c, 1);
+  }, 110);
+  scheduleOffer();
+  setTimeout(() => {
+    if(over) return;
+    setAura($('#aura'), null);
+    scheduleOffer();
+  }, 6000);
+}
+/* DarkSpeakerHare: Execution — временная механика, уточнить */
+function executionLegacy(){
+  restart($('#fP'), 'lunge');
+  sfx.execution();
+  setTimeout(() => {
+    if(over) return;
+    const c = center($('#fE'));
+    particle('dsmoke', c.x, c.y, 0, 0, 700, 260);
+    shockRing(c, 'rgba(255,23,68,.95)');
+    dustBig(c, 10);
+    notes(c, 3);
+    damageEnemy(rnd(180, 240));
+  }, 250);
+}
+
+function ambient(){
+  if(over) return;
+  particle('mote', rnd(0, innerWidth), rnd(innerHeight * 0.25, innerHeight), rnd(-30,30), rnd(-90,-30), 2600 + rnd(0,1200), 4);
+}
+function emberBurst(c, kind){
+  const col = kind === 'purple' ? 'rspark' : 'spark';
+  for(let i = 0; i < 14; i++) particle(col, c.x + rnd(-30,30), c.y + rnd(-30,30), rnd(-110,110), rnd(-120,40), 600 + rnd(0,400));
+}
+/* LargeSpeakerHare: SoundWave V2 — острые тонкие кольца и искры */
+function sharpWaveFx(){
+  const a = center($('#fP')), b = center($('#fE'));
+  for(let k = 0; k < 3; k++) setTimeout(() => {
+    if(over) return;
+    const r = document.createElement('div'); r.className = 'sharpRing';
+    r.style.left = a.x + 'px'; r.style.top = a.y + 'px';
+    document.body.appendChild(r);
+    r.animate([
+      { transform:'translate(0,0) scale(1)', opacity:1 },
+      { transform:`translate(${b.x-a.x}px,${b.y-a.y}px) scale(1.4)`, opacity:0 }
+    ], { duration:420, easing:'cubic-bezier(.2,.8,.4,1)', fill:'forwards' });
+    setTimeout(() => r.remove(), 460);
+  }, k * 70);
+  for(let i = 0; i < 10; i++) particle('rspark', a.x + rnd(-30,30), a.y + rnd(-40,40), (b.x-a.x)*0.5 + rnd(-40,40), rnd(-60,40), 400 + rnd(0,200));
+}
+/* DarkSpeakerHare: Slash V2 — красная вспышка, два белых неоновых разреза, искры, пыль, ноты */
+function slashLine(c, angle, idx){
+  if(over) return;
+  const mk = (cls, dx, dy, ang, dur) => {
+    const s = document.createElement('div'); s.className = cls;
+    s.style.left = (c.x + dx) + 'px'; s.style.top = (c.y + dy) + 'px';
+    s.style.transform = `translate(-50%,-50%) rotate(${ang}deg)`;
+    document.body.appendChild(s); setTimeout(() => s.remove(), dur);
+  };
+  mk('slashRed', 0, 0, angle, 640);
+  mk('slashX', 0, 0, angle, 520);
+  mk('slashX2', 14, -10, angle + 4, 520);
+  mk('slashX2', -10, 12, angle - 3, 520);
+  sfx.slashHit();
+  restart($('#fE'), 'jit');
+  restart($('#arena'), 'quake');
+  shockRing(c, 'rgba(255,23,68,.95)');
+  for(let i = 0; i < 12; i++) particle('spark', c.x + rnd(-80,80), c.y + rnd(-60,60), rnd(-120,120), rnd(-120,60), 500);
+  for(let i = 0; i < 12; i++) particle('rspark', c.x + rnd(-80,80), c.y + rnd(-60,60), rnd(-120,120), rnd(-120,60), 500);
+  for(let i = 0; i < 8; i++) particle('rdust', c.x + rnd(-90,90), c.y + rnd(-60,60), rnd(-80,80), rnd(-60,30), 800 + rnd(0,300), rnd(50,110));
+  smokeAt($('#fE'), 170);
+  notes(c, 5);
+  damageEnemy(idx === 0 ? rnd(357, 389) : rnd(478, 577));
+}
+/* DarkSpeakerHare: Execution — кучка белых лезвий с красной обводкой, 789–881 урона */
+function impactBlade(c){
+  particle('flash', c.x, c.y, 0, 0, 260, 60);
+  shockRing(c, 'rgba(255,23,68,.95)');
+  for(let i = 0; i < 14; i++) particle('rspark', c.x + rnd(-40,40), c.y + rnd(-40,40), rnd(-120,120), rnd(-120,60), 500 + rnd(0,300));
+  for(let i = 0; i < 8; i++) particle('rdust', c.x + rnd(-60,60), c.y + rnd(-50,50), rnd(-80,80), rnd(-60,30), 800 + rnd(0,300), rnd(50,110));
+  smokeAt($('#fE'), 120);
+  notes(c, 2);
+}
+function executionV2(){
+  restart($('#fP'), 'lunge');
+  sfx.execution();
+  const from = center($('#fP')), to = center($('#fE'));
+  notes(from, 6);
+  const total = rnd(789, 881), N = 6;
+  let left = total;
+  for(let i = 0; i < N; i++){
+    const part = i === N - 1 ? left : Math.floor(total / N);
+    left -= part;
+    setTimeout(() => {
+      if(over) return;
+      sfx.blade();
+      const start = { x: from.x + rnd(-100,100), y: from.y + rnd(-130,30) };
+      arcFly('blade', start, { x: to.x + rnd(-40,40), y: to.y + rnd(-50,50) }, 380, rnd(40,120), 'rspark', () => {
+        if(over) return;
+        sfx.bladeHit();
+        impactBlade(center($('#fE')));
+        damageEnemy(part);
+      });
+    }, 150 + i * 170);
+  }
+}
+/* DarkSpeakerHare: SpeedBoost V2 — сразу три атаки подряд (0, 2, 4 сек), затем буст заканчивается и 5 секунд без атак */
+function speedBoostV2(){
+  P.boostUntil = Date.now() + 6000;
+  clearTimeout(offerTimer);
+  restart($('#fP'), 'greenBlink');
+  sfx.darkBoost();
+  setAura($('#aura'), 'red');
+  notes(center($('#fP')), 6);
+  offerAbilities();
+  setTimeout(offerAbilities, 2000);
+  setTimeout(offerAbilities, 4000);
+  const iv = setInterval(() => {
+    if(over || Date.now() > P.boostUntil){ clearInterval(iv); return; }
+    const c = center($('#fP'));
+    particle('rsteam', c.x + rnd(-50,50), c.y + rnd(-20,40), rnd(-14,14), -rnd(60,110), 900 + rnd(0,400), rnd(22,50));
+    particle('rspark', c.x + rnd(-60,60), c.y + rnd(-60,40), rnd(-30,30), rnd(-50,20), 400);
+    if(Math.random() < 0.3) notes(c, 1);
+  }, 110);
+  setTimeout(() => {
+    clearInterval(iv);
+    if(over) return;
+    setAura($('#aura'), null);
+    P.noAttackUntil = Date.now() + 5000;
+    scheduleOffer();
+  }, 6000);
+}
+
+/* ================================================================
+   EnergizedTvHare — фиолетово-чёрные эффекты, больше и острее, чем у DarkSpeakerHare
+   ================================================================ */
+const PURPLE = '#c084fc';
+/* Россыпь фиолетовых эффектов: острые искры, светящиеся точки, молнии, дым */
+function zfx(c, n, spread){
+  spread = spread || 70;
+  for(let i = 0; i < n; i++){
+    const r = Math.random(), x = c.x + rnd(-spread, spread), y = c.y + rnd(-spread, spread);
+    if(r < 0.32) particle('zspark', x, y, rnd(-110,110), rnd(-130,30), 450 + rnd(0,400));
+    else if(r < 0.55) particle('zdot', x, y, rnd(-90,90), rnd(-100,30), 500 + rnd(0,400));
+    else if(r < 0.78) particle('zsmoke', x, y, rnd(-40,40), rnd(-70,-10), 900 + rnd(0,500), rnd(50,120));
+    else if(r < 0.9) particle('zbolt', x, y, rnd(-50,50), rnd(-50,50), 280 + rnd(0,160));
+    else particle('zsmoke2', x, y, rnd(-30,30), rnd(-60,-10), 800 + rnd(0,400), rnd(50,100));
+  }
+}
+function zBurst(c, big){
+  const k = big ? 2 : 1;
+  particle('flash p', c.x, c.y, 0, 0, 320, 110 * k);
+  shockRing(c, 'rgba(192,132,252,.95)');
+  setTimeout(() => shockRing(c, 'rgba(255,255,255,.7)'), 110);
+  setTimeout(() => shockRing(c, 'rgba(60,10,110,.9)'), 220);
+  zfx(c, 18 * k, 80);
+  dustBig(c, 5 * k);
+}
+/* Slash V3 — три лезвия, фиолетовое с чёрным и белым, искры остаются после удара */
+function slashLineP(c, angle, idx){
+  if(over) return;
+  const fin = idx === 2;
+  const mk = (cls, dx, dy, ang, dur, w) => {
+    const s = document.createElement('div'); s.className = cls;
+    s.style.left = (c.x + dx) + 'px'; s.style.top = (c.y + dy) + 'px';
+    if(w) s.style.width = w;
+    s.style.transform = `translate(-50%,-50%) rotate(${ang}deg)`;
+    document.body.appendChild(s); setTimeout(() => s.remove(), dur);
+  };
+  mk('slashPg', 0, 0, angle, 760);
+  mk('slashPb', 0, 3, angle, 560);
+  mk('slashP', 0, 0, angle, 600);
+  mk('slashP2', 16, -10, angle + 4, 560);
+  mk('slashP2', -12, 12, angle - 3, 560);
+  if(fin){
+    mk('slashPg', 0, 0, angle + 38, 800, 'min(110vw,980px)');
+    mk('slashP', 0, 0, angle + 38, 650, 'min(104vw,900px)');
+    mk('slashP2', 0, 0, angle - 40, 600);
+    const pf = $('#purpleFlash'); pf.classList.remove('go'); void pf.offsetWidth; pf.classList.add('go');
+    sfx.slashV3Fin();
+  } else {
+    sfx.slashV3Hit();
+  }
+  restart($('#fE'), 'jit');
+  restart($('#arena'), 'quake');
+  zBurst(c, fin);
+  setTimeout(() => shockRing(c, 'rgba(255,255,255,.6)'), 140);
+  /* искры остаются после удара: долго падают и тлеют */
+  const lingering = fin ? 34 : 16;
+  for(let i = 0; i < lingering; i++){
+    setTimeout(() => {
+      if(over) return;
+      particle(i % 3 ? 'zspark' : 'zdot', c.x + rnd(-100,100), c.y + rnd(-70,50), rnd(-50,50), rnd(20,130), 1300 + rnd(0,1000));
+    }, rnd(0, 700));
+  }
+  for(let i = 0; i < (fin ? 10 : 5); i++) particle('zsmoke', c.x + rnd(-80,80), c.y + rnd(-60,60), rnd(-40,40), rnd(-60,-10), 1100 + rnd(0,500), rnd(80,150));
+  smokeAt($('#fE'), fin ? 230 : 170);
+  notes(c, fin ? 6 : 3, PURPLE);
+  const ranges = [[578,779],[467,678],[789,1091]];
+  damageEnemy(rnd(ranges[idx][0], ranges[idx][1]));
+}
+function slashV3(){
+  restart($('#fP'), 'lunge');
+  const p = center($('#fP'));
+  zfx(p, 14, 60);
+  shockRing(p, 'rgba(192,132,252,.9)');
+  sfx.slashV3();
+  setTimeout(() => {
+    if(over) return;
+    const c = center($('#fE'));
+    slashLineP(c, -30, 0);
+    setTimeout(() => { if(!over){ sfx.slashV3(); slashLineP(c, 24, 1); } }, 340);
+    setTimeout(() => { if(!over){ sfx.slashV3(); restart($('#fP'), 'lunge'); } }, 760);
+    setTimeout(() => { if(!over) slashLineP(c, -4, 2); }, 900);
+  }, 220);
+}
+
+/* EnergizedScreen — мгновенный звук, дрожь, 15 секунд стана: враг не может атаковать, урона нет */
+function energizedScreen(){
+  playPS(); /* звук сразу, без задержек */
+  const pf = $('#purpleFlash'); pf.classList.remove('go'); void pf.offsetWidth; pf.classList.add('go');
+  const fp = $('#fP'), fe = $('#fE'), DUR = 15000, end = Date.now() + DUR;
+  E.stunUntil = end;
+  if(E.pending && !E.pending.landed) E.pending.cancelled = true;
+  scheduleEnemy(DUR + 150);
+  fp.classList.add('tremble'); fe.classList.add('tremble');
+  setAura($('#aura'), 'z'); setAura($('#eaura'), 'z');
+  restart($('#arena'), 'quake');
+  const p0 = center(fp), e0 = center(fe);
+  zBurst(p0, true); zBurst(e0, true);
+  floatText(fe, 'STUN', PURPLE);
+  const fxIv = setInterval(() => {
+    if(over || Date.now() > end){ clearInterval(fxIv); return; }
+    const p = center(fp), e = center(fe);
+    zfx(p, 5, 70);
+    zfx(e, 9, 75);
+    /* фиолетовые искры с дымом и напряжением выходят из врага */
+    particle('zsmoke', e.x + rnd(-50,50), e.y + rnd(-20,50), rnd(-30,30), -rnd(70,130), 1100 + rnd(0,500), rnd(60,120));
+    particle('zspark', e.x + rnd(-50,50), e.y + rnd(-40,40), rnd(-60,60), -rnd(40,120), 600 + rnd(0,300));
+  }, 170);
+  const arcIv = setInterval(() => {
+    if(over || Date.now() > end){ clearInterval(arcIv); return; }
+    const p = center(fp), e = center(fe);
+    for(let i = 0; i < 2; i++) ray(p.x + rnd(-30,30), p.y + rnd(-60,30), e.x + rnd(-40,40), e.y + rnd(-50,40), 260, 'zray');
+    sfx.zapBig();
+  }, 650);
+  const ringIv = setInterval(() => {
+    if(over || Date.now() > end){ clearInterval(ringIv); return; }
+    const e = center(fe), w = document.createElement('div'); w.className = 'pwave';
+    w.style.left = (e.x + rnd(-20,20)) + 'px'; w.style.top = (e.y + rnd(-40,20)) + 'px';
+    document.body.appendChild(w);
+    w.animate([
+      { transform:'translate(-50%,-50%) scale(.2)', opacity:.9 },
+      { transform:'translate(-50%,-50%) scale(2.8)', opacity:0 }
+    ], { duration:1000, easing:'ease-out', fill:'forwards' });
+    setTimeout(() => w.remove(), 1050);
+  }, 420);
+  setTimeout(() => {
+    clearInterval(fxIv); clearInterval(arcIv); clearInterval(ringIv);
+    fp.classList.remove('tremble'); fe.classList.remove('tremble');
+    setAura($('#aura'), null); setAura($('#eaura'), null);
+  }, DUR);
+}
+
+/* Submerge — телепорт, живой чёрный дым вокруг (−10 урона от каждой атаки врага), пила с неба */
+function sawPoly(a0, a1, half){
+  const pts = [], step = 7.5;
+  if(half) pts.push('50% 50%');
+  for(let a = a0; a <= a1; a += step){
+    const odd = Math.round((a - a0) / step) % 2, r = odd ? 38 : 50, rad = a * Math.PI / 180;
+    pts.push((50 + r * Math.cos(rad)).toFixed(1) + '% ' + (50 + r * Math.sin(rad)).toFixed(1) + '%');
+  }
+  if(half) pts.push('50% 50%');
+  return 'polygon(' + pts.join(',') + ')';
+}
+function makeSaw(a0, a1, half){
+  const s = document.createElement('div'); s.className = 'saw';
+  s.style.clipPath = sawPoly(a0, a1, half);
+  document.body.appendChild(s);
+  return s;
+}
+function submerge(){
+  playSnd('tele', TELE_SND, 1.3); /* звук сразу */
+  const fp = $('#fP'), SMOKE = 3400, end = Date.now() + SMOKE;
+  P.submergeUntil = end;
+  const c0 = center(fp);
+  zBurst(c0, false);
+  /* густой клубящийся дым, который "парит": много слоёв, разный размер и дрейф */
+  const smokeIv = setInterval(() => {
+    if(over || Date.now() > end){ clearInterval(smokeIv); return; }
+    const c = center(fp);
+    for(let i = 0; i < 3; i++){
+      particle('zsmoke', c.x + rnd(-85,85), c.y + rnd(-95,60), rnd(-35,35), rnd(-55,-8), 1300 + rnd(0,700), rnd(90,180));
+    }
+    particle('zsmoke2', c.x + rnd(-70,70), c.y + rnd(-70,50), rnd(-30,30), rnd(-40,-5), 1100 + rnd(0,500), rnd(70,130));
+    particle('zspark', c.x + rnd(-80,80), c.y + rnd(-90,60), rnd(-40,40), rnd(-70,10), 500 + rnd(0,300));
+    particle('zdot', c.x + rnd(-80,80), c.y + rnd(-90,60), rnd(-30,30), rnd(-50,20), 600 + rnd(0,400));
+    if(Math.random() < 0.5) particle('mote', c.x + rnd(-90,90), c.y + rnd(-80,70), rnd(-20,20), rnd(-60,-15), 1400 + rnd(0,600), rnd(3,6));
+  }, 80);
+  fp.style.filter = 'brightness(.35) saturate(.7)';
+  /* пила падает с неба на врага */
+  setTimeout(() => {
+    if(over) return;
+    playSnd('saw', SAW_SND, 1.3);
+    const e = center($('#fE'));
+    const saw = makeSaw(0, 360, false);
+    const startY = -160, endY = e.y;
+    const kf = [];
+    for(let i = 0; i <= 10; i++){
+      const t = i / 10;
+      kf.push({ transform:`translate(${e.x + (1 - t) * 40}px,${startY + (endY - startY) * t * t}px) rotate(${t * 900}deg)`, offset:t });
+    }
+    const tr = setInterval(() => {
+      const r = saw.getBoundingClientRect();
+      particle('zspark', r.left + r.width/2 + rnd(-20,20), r.top + r.height/2 + rnd(-20,20), rnd(-20,20), rnd(-30,10), 380);
+      particle('zdot', r.left + r.width/2, r.top + r.height/2, rnd(-15,15), rnd(-15,15), 300);
+    }, 35);
+    saw.animate(kf, { duration:420, easing:'linear', fill:'forwards' }).onfinish = () => {
+      clearInterval(tr);
+      saw.remove();
+      if(over) return;
+      const hit = center($('#fE'));
+      sfx.sawBreak();
+      restart($('#arena'), 'quake');
+      /* пила разламывается на две половины */
+      [[0,180,-1],[180,360,1]].forEach(([a0, a1, dir]) => {
+        const h = makeSaw(a0, a1, true);
+        h.animate([
+          { transform:`translate(${hit.x}px,${hit.y}px) rotate(0deg)`, opacity:1 },
+          { transform:`translate(${hit.x + dir * 150}px,${hit.y + (dir > 0 ? 70 : -40)}px) rotate(${dir * 220}deg)`, opacity:0 }
+        ], { duration:650, easing:'ease-out', fill:'forwards' }).onfinish = () => h.remove();
+      });
+      zBurst(hit, true);
+      for(let i = 0; i < 12; i++) particle('shard', hit.x + rnd(-20,20), hit.y + rnd(-20,20), rnd(-120,120), rnd(-110,40), 600 + rnd(0,300));
+      for(let i = 0; i < 8; i++) particle('zsmoke', hit.x + rnd(-70,70), hit.y + rnd(-60,60), rnd(-60,60), rnd(-80,-10), 1000 + rnd(0,500), rnd(90,170));
+      notes(hit, 7, PURPLE);
+      damageEnemy(rnd(789, 1279));
+    };
+  }, 1100);
+  setTimeout(() => {
+    clearInterval(smokeIv);
+    fp.style.filter = '';
+    /* дым рассеивается */
+    const c = center(fp);
+    for(let i = 0; i < 8; i++) particle('zsmoke', c.x + rnd(-70,70), c.y + rnd(-70,50), rnd(-70,70), rnd(-90,-20), 800 + rnd(0,400), rnd(90,160));
+    shockRing(c, 'rgba(192,132,252,.8)');
+  }, SMOKE);
+}
+
+/* Destruction — пробуждение (нужно 3 атаки): огромный фиолетовый лазер, 100 урона каждые 500 мс, 3 секунды */
+function makeZBeam(x1, y1, x2, y2){
+  const d = document.createElement('div'); d.className = 'zbeam';
+  const len = Math.hypot(x2 - x1, y2 - y1), ang = Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI;
+  d.style.left = x1 + 'px'; d.style.top = y1 + 'px'; d.style.width = len + 'px';
+  d.style.transform = `rotate(${ang}deg)`;
+  document.body.appendChild(d);
+  d.animate([{ clipPath:'inset(0 100% 0 0)' }, { clipPath:'inset(0 0 0 0)' }], { duration:260, easing:'ease-out', fill:'forwards' });
+  return d;
+}
+function destruction(){
+  const fp = $('#fP');
+  /* зарядка: дым, искры, моргание, огонь, фиолетовый/чёрный/белый */
+  restart(fp, 'greenBlink');
+  setAura($('#aura'), 'z');
+  fp.classList.add('tremble');
+  const c0 = center(fp);
+  zBurst(c0, true);
+  restart($('#arena'), 'quake');
+  for(let i = 0; i < 16; i++) particle('zfire', c0.x + rnd(-60,60), c0.y + rnd(-30,60), rnd(-25,25), -rnd(70,150), 700 + rnd(0,500), rnd(16,34));
+  const chIv = setInterval(() => {
+    if(over){ clearInterval(chIv); return; }
+    const c = center(fp);
+    zfx(c, 8, 75);
+    particle('zfire', c.x + rnd(-50,50), c.y + rnd(-10,60), rnd(-20,20), -rnd(60,130), 700 + rnd(0,400), rnd(16,32));
+  }, 100);
+  setTimeout(() => {
+    if(over){ clearInterval(chIv); return; }
+    sfx.laserBuzz(3.4);
+    const a = center(fp), b = center($('#fE'));
+    const beam = makeZBeam(a.x + 30, a.y - 20, b.x, b.y);
+    zBurst(center($('#fE')), true);
+    let n = 0;
+    const END = 3000;
+    const t0 = Date.now();
+    const dmgIv = setInterval(() => {
+      if(over || ++n > 6){ clearInterval(dmgIv); return; }
+      damageEnemy(100);
+      const e = center($('#fE'));
+      restart($('#arena'), 'quake');
+      /* сгоревшие камни разлетаются */
+      for(let i = 0; i < 4; i++){
+        arcFly('burnrock', { x:e.x + rnd(-25,25), y:e.y + rnd(0,50) }, { x:e.x + rnd(-170,170), y:e.y + rnd(40,120) }, 620 + rnd(0,200), rnd(70,150), 'zdot');
+      }
+      zfx(e, 10, 70);
+      smokeAt($('#fE'), 150);
+    }, 500);
+    const fxIv = setInterval(() => {
+      if(over || Date.now() - t0 > END){ clearInterval(fxIv); return; }
+      const c = center(fp), e = center($('#fE'));
+      zfx(c, 5, 70);
+      particle('zfire', c.x + rnd(-50,50), c.y + rnd(0,60), rnd(-20,20), -rnd(60,120), 600 + rnd(0,300), rnd(14,28));
+      particle('zspark', e.x + rnd(-60,60), e.y + rnd(-60,60), rnd(-90,90), rnd(-100,30), 450);
+      particle('zsmoke', e.x + rnd(-60,60), e.y + rnd(-40,50), rnd(-50,50), -rnd(60,120), 900 + rnd(0,400), rnd(70,140));
+      ray(c.x + rnd(-20,20), c.y + rnd(-40,20), e.x + rnd(-40,40), e.y + rnd(-40,40), 200, 'zray');
+    }, 110);
+    setTimeout(() => {
+      clearInterval(chIv); clearInterval(fxIv);
+      beam.remove();
+      fp.classList.remove('tremble');
+      setAura($('#aura'), null);
+      if(!over){
+        const c = center(fp);
+        zBurst(c, false);
+        const e = center($('#fE'));
+        zfx(e, 14, 80);
+      }
+    }, END);
+  }, 650);
+}
+
+/* ===== FIGHT ===== */
+function startFight(){
+  if(!sel.char || !sel.enemy) return;
+  const C = A.chars[sel.char], N = A.enemies[sel.enemy];
+  P = { d:C, hp:C.hp, max:C.hp, boostUntil:0, blockDone:false, atk:0, submergeUntil:0 };
+  E = { d:N, hp:N.hp, max:N.hp, boosting:false, pending:null, due:0, stunUntil:0 };
+  over = false; abilOpen = false;
+  const fp = $('#fP'), fe = $('#fE');
+  fp.src = C.model; fe.src = N.model;
+  const SZ = { LargeCameraHare:1.12, LargeSpeakerHare:1.2, LargeTvHare:1.32, DarkSpeakerHare:1.25, EnergizedTvHare:1.25 }[sel.char] || 1;
+  $('#pWrap').style.width = `min(${(40*SZ).toFixed(1)}vw,${Math.round(260*SZ)}px)`;
+  fp.style.filter = '';
+  fp.classList.remove('broken', 'tremble'); fe.classList.remove('broken', 'gone', 'glitchOut', 'glitchIn', 'tremble');
+  if(N.glitch) fe.classList.add('glitchShake'); else fe.classList.remove('glitchShake');
+  fp.onerror = () => fp.classList.add('broken');
+  fe.onerror = () => fe.classList.add('broken');
+  const btns = $('#abil').querySelectorAll('.ab');
+  btns.forEach(b => b.classList.remove('locked'));
+  C.abl.forEach((n, i) => { btns[i].textContent = n; btns[i].dataset.ab = n; });
+  btns.forEach((b, i) => { b.style.display = C.abl[i] ? '' : 'none'; });
+  updateLock();
+  $('#result').classList.remove('on');
+  hideAbilities(); setAura($('#aura'), null); setAura($('#eaura'), null); updateBars();
+  menuAudio.pause(); menuAudio.currentTime = 0;
+  playAudio(pvpAudio);
+  go('arena', () => {
+    scheduleOffer();
+    if(!N.glitch) scheduleEnemy(N.headCd);
+    ambientIv = setInterval(ambient, 450);
+    if(N.shoot) shootTimer = setInterval(enemyShoot, 8000);
+    if(N.lasers) lasersTimer = setInterval(enemyLasers, 10000);
+    if(N.boost) boostTimer = setInterval(enemyBoost, 30000);
+    if(N.boostV2) boostTimer = setInterval(enemyBoostV2, 30000);
+    if(N.rockets){ E.rocketReady = Date.now() + 10000; rocketsTimer = setInterval(() => { if(!over && Date.now() >= E.rocketReady) enemyRockets(); }, 500); }
+    if(N.acid){ E.acidReady = Date.now() + 10000; acidTimer = setInterval(() => { if(!over && Date.now() >= E.acidReady) enemyAcid(); }, 500); }
+    if(N.glitch) glitchTimer = setInterval(enemyGlitch, 3000);
+  });
+}
+$('#abil').addEventListener('click', e => {
+  const b = e.target.closest('.ab');
+  if(b) useAbility(b.dataset.ab);
+});
+function exitFight(){
+  endFight();
+  $('#fP').style.filter = '';
+  fadeOutAudio(pvpAudio, 400);
+  playAudio(menuAudio);
+  go('select');
+}
+$('#exitBtn').onclick = exitFight;
+$('#resOk').onclick = exitFight;A.enemies["PurpleBuzzawToilet"] = {
+  icon:'https://www.dropbox.com/scl/fi/n7b74rom5cit28p8wrb4p/Picsart_26-11-06_15-52-44-953.jpg?rlkey=vynfp3rknbgoa3i5qwe19yqwg&st=cx853jji&dl=1',
+  model:'https://www.dropbox.com/scl/fi/nxyyctx9qo5jw0jqbf4b3/IMG_20261106_150645_255.png?rlkey=kde7hpyj48jtqsohoziexvqs7&st=cnkvzr40&dl=1',
+  info:'Помешал, молодец.', abil:'Buzzaw-Slash', hp:1850, stars:'☆☆☆', headCd:6000, buzz:true
+};
+buildIcons($('#enemyIcons'), A.enemies, key => {
+  sel.enemy = key;
+  renderCard($('#enemyCard'), key, A.enemies[key], 'enemy', 'СТАРТ', startFight);
+
+});
+
+const bzStyle = document.createElement('style');
+bzStyle.textContent = `
+@keyframes buzzHover{0%,100%{translate:0 0}50%{translate:0 -12px}}
+@keyframes buzzShake{0%,100%{translate:0 0}20%{translate:-6px 2px}40%{translate:6px -2px}60%{translate:-4px 1px}80%{translate:3px 0}}
+#eWrap.hov{animation:buzzHover 2.4s ease-in-out infinite}
+#eWrap.hov::after{opacity:.45;transform:scale(.8)}
+.buzzShake{animation:buzzShake .5s linear}
+.bzRock{position:fixed;left:0;top:0;width:24px;height:20px;margin:-10px 0 0 -12px;border-radius:42% 58% 50% 50%;background:radial-gradient(circle at 35% 30%,#fde68a,#ea580c 35%,#78350f 70%,#1c1917);box-shadow:0 0 10px #f97316,0 0 4px #fde047;z-index:170;pointer-events:none}
+.bzFire{position:fixed;left:0;top:0;width:10px;height:14px;margin:-7px 0 0 -5px;border-radius:50% 50% 50% 50%/65% 65% 35% 35%;background:radial-gradient(circle at 50% 70%,#fef08a,#f97316 50%,#7c2d12 85%);box-shadow:0 0 10px #f97316;z-index:168;pointer-events:none}
+.bzSpark{position:fixed;left:0;top:0;width:4px;height:4px;margin:-2px 0 0 -2px;border-radius:50%;background:#fde047;box-shadow:0 0 6px #facc15,0 0 3px #fff;z-index:172;pointer-events:none}
+`;
+document.head.appendChild(bzStyle);
+
+sfx.buzzCut = function(){
+  tone(90, 70, 0.5, 'sawtooth', 0.3);
+  noise(0.5, 0.45, 2600);
+  tone(170, 130, 0.5, 'square', 0.1);
+};
+sfx.bzImpact = function(){
+  noise(0.45, 1, 900);
+  tone(160, 40, 0.5, 'sine', 0.9);
+};
+
+function bzUnderFx(){
+  const e = center($('#fE'));
+  for(let i = 0; i < 10; i++) particle('bzFire', e.x + rnd(-70,70), e.y + rnd(40,80), rnd(-40,40), -rnd(60,140), 600 + rnd(0,400), rnd(10,22));
+  for(let i = 0; i < 6; i++) particle('dsmoke', e.x + rnd(-80,80), e.y + rnd(40,80), rnd(-30,30), -rnd(40,100), 1000 + rnd(0,500), rnd(90,150));
+  for(let i = 0; i < 14; i++) particle('bzSpark', e.x + rnd(-60,60), e.y + rnd(30,70), rnd(-110,110), rnd(-60,80), 500 + rnd(0,300));
+  dustCloud($('#fE'), 3);
+}
+
+function buzzSlash(){
+  if(over) return;
+  const fe = $('#fE'), fp = $('#fP');
+  const pend = { cancelled:false, landed:false };
+  E.pending = pend;
+  scheduleEnemy(E.d.headCd);
+
+  restart(fe, 'buzzShake');
+  sfx.buzzCut();
+  bzUnderFx();
+
+  setTimeout(() => {
+    if(over) return;
+    const e = center(fe), t = center(fp);
+    for(let i = 0; i < 7; i++){
+      const from = { x:e.x + rnd(-70,70), y:e.y + rnd(40,70) };
+      const to = { x:t.x + rnd(-60,60), y:t.y + rnd(-50,50) };
+      arcFly('bzRock', from, to, 480 + rnd(0,120), rnd(60,140), 'bzFire', () => {
+        if(over) return;
+        dustCloud(fp, 2);
+        particle('bzSpark', to.x, to.y, rnd(-60,60), rnd(-60,20), 380);
+      });
+    }
+  }, 120);
+
+  setTimeout(() => {
+    if(over || pend.cancelled) return;
+    pend.landed = true;
+    const c = center(fp);
+    sfx.bzImpact();
+    particle('flash', c.x, c.y, 0, 0, 260, 110);
+    shockRing(c, 'rgba(251,146,60,.95)');
+    restart($('#arena'), 'quake');
+    for(let i = 0; i < 16; i++) particle('bzSpark', c.x + rnd(-40,40), c.y + rnd(-40,40), rnd(-120,120), rnd(-120,50), 500 + rnd(0,300));
+    for(let i = 0; i < 8; i++) particle('dsmoke', c.x + rnd(-60,60), c.y + rnd(-60,60), rnd(-60,60), rnd(-80,-10), 900 + rnd(0,400), rnd(80,150));
+    smokeAt(fp, 170);
+    damagePlayer(rnd(458, 678), '#fb923c');
+  }, 600);
+}
+
+const _enemyAttackBz = enemyAttack;
+enemyAttack = function(){
+  if(over || !E || !E.d.buzz) return _enemyAttackBz();
+  if(stunned()){ scheduleEnemy(E.stunUntil - Date.now() + 50); return; }
+  if(E.pauseUntil && Date.now() < E.pauseUntil){ scheduleEnemy(E.pauseUntil - Date.now() + 50); return; }
+  buzzSlash();
+};
+
+const _startFightBz = startFight;
+startFight = function(){
+  _startFightBz();
+  const N = sel.enemy && A.enemies[sel.enemy];
+  $('#eWrap').classList.toggle('hov', !!(N && N.buzz));
+};const bzSlStyle = document.createElement('style');
+bzSlStyle.textContent = `
+@keyframes bzSweep{
+  0%{transform:translate(-50%,-50%) rotate(var(--a)) translateX(-45%) scaleX(.15);opacity:0}
+  25%{opacity:1}
+  100%{transform:translate(-50%,-50%) rotate(var(--a)) translateX(45%) scaleX(1);opacity:0}
+}
+@keyframes bzSweepThin{
+  0%{transform:translate(-50%,-50%) rotate(var(--a)) translateX(-40%) scaleX(.1);opacity:0}
+  30%{opacity:1}
+  100%{transform:translate(-50%,-50%) rotate(var(--a)) translateX(40%) scaleX(1);opacity:0}
+}
+.bzSlRed{position:fixed;left:0;top:0;width:min(100vw,860px);height:90px;background:radial-gradient(ellipse,rgba(249,115,22,.85),rgba(124,45,18,.4) 45%,rgba(0,0,0,0) 72%);z-index:177;pointer-events:none;animation:bzSweep .7s ease-out forwards}
+.bzSlLine{position:fixed;left:0;top:0;width:min(96vw,800px);height:16px;background:linear-gradient(90deg,rgba(255,255,255,0),#fff7ed 30%,#ffffff 50%,#fdba74 72%,rgba(255,255,255,0));clip-path:polygon(0 50%,8% 0,92% 0,100% 50%,92% 100%,8% 100%);filter:drop-shadow(0 0 5px #f97316) drop-shadow(0 0 14px #ea580c);z-index:178;pointer-events:none;animation:bzSweep .55s ease-out forwards}
+.bzSlLine2{position:fixed;left:0;top:0;width:min(96vw,800px);height:4px;background:linear-gradient(90deg,rgba(0,0,0,0),#fff 40%,#fff 60%,rgba(0,0,0,0));box-shadow:0 0 6px #fb923c,0 0 12px #f97316;z-index:179;pointer-events:none;animation:bzSweepThin .5s ease-out .04s forwards}
+.bzSlEmber{position:fixed;left:0;top:0;width:6px;height:6px;margin:-3px 0 0 -3px;border-radius:50%;background:radial-gradient(circle,#fff7ae,#fb923c 55%,#9a3412);box-shadow:0 0 8px #f97316;z-index:172;pointer-events:none}
+.bzSlSmoke{position:fixed;left:0;top:0;border-radius:50%;background:radial-gradient(circle,rgba(60,30,15,.9),rgba(20,10,5,.5) 50%,rgba(0,0,0,0) 72%);z-index:166;pointer-events:none}
+`;
+document.head.appendChild(bzSlStyle);
+
+function bzSlashSweep(c, ang){
+  const mk = (cls, dx, dy, a, dur) => {
+    const s = document.createElement('div');
+    s.className = cls;
+    s.style.left = (c.x + dx) + 'px';
+    s.style.top = (c.y + dy) + 'px';
+    s.style.setProperty('--a', a + 'deg');
+    s.style.transform = `translate(-50%,-50%) rotate(${a}deg)`;
+    document.body.appendChild(s);
+    setTimeout(() => s.remove(), dur);
+  };
+  mk('bzSlRed', 0, 0, ang, 700);
+  mk('bzSlLine', 0, 0, ang, 560);
+  mk('bzSlLine2', 14, -10, ang + 4, 520);
+  mk('bzSlLine2', -10, 12, ang - 3, 520);
+
+  const rad = ang * Math.PI / 180, half = 360;
+  let k = 0;
+  const iv = setInterval(() => {
+    if(over || ++k > 12){ clearInterval(iv); return; }
+    const t = (k / 12) * 2 - 1;
+    const x = c.x + Math.cos(rad) * t * half * 0.45;
+    const y = c.y + Math.sin(rad) * t * half * 0.45;
+    particle('bzSlEmber', x + rnd(-10,10), y + rnd(-10,10), rnd(-90,90), rnd(-110,30), 480 + rnd(0,200));
+    particle('bzSlEmber', x, y, rnd(-50,50), rnd(-80,-10), 360);
+    if(k % 2 === 0) particle('bzSlSmoke', x + rnd(-30,30), y + rnd(-30,30), rnd(-30,30), rnd(-70,-20), 900 + rnd(0,400), rnd(90,150));
+  }, 42);
+}
+
+function bzSlashBurst(c){
+  particle('flash', c.x, c.y, 0, 0, 260, 120);
+  shockRing(c, 'rgba(251,146,60,.95)');
+  setTimeout(() => shockRing(c, 'rgba(253,224,71,.6)'), 120);
+  for(let i = 0; i < 18; i++) particle('bzSlEmber', c.x + rnd(-50,50), c.y + rnd(-50,50), rnd(-140,140), rnd(-140,40), 500 + rnd(0,300));
+  for(let i = 0; i < 10; i++) particle('bzSlSmoke', c.x + rnd(-70,70), c.y + rnd(-60,60), rnd(-60,60), rnd(-90,-10), 1000 + rnd(0,500), rnd(90,170));
+  for(let i = 0; i < 5; i++){
+    arcFly('bzRock', { x:c.x + rnd(-30,30), y:c.y + rnd(-20,20) }, { x:c.x + rnd(-200,200), y:c.y + rnd(60,170) }, 650 + rnd(0,250), rnd(70,160), 'bzFire');
+  }
+  dustBig(c, 6);
+}
+
+sfx.bzSweep = function(){
+  noise(0.45, 0.75, 5200);
+  tone(1400, 280, 0.32, 'sawtooth', 0.14);
+  tone(700, 180, 0.3, 'square', 0.08);
+};
+sfx.bzHit = function(){
+  noise(0.25, 0.9, 3000);
+  tone(320, 50, 0.3, 'sine', 0.8);
+};
+
+buzzSlash = function(){
+  if(over) return;
+  const fe = $('#fE'), fp = $('#fP');
+  const pend = { cancelled:false, landed:false };
+  E.pending = pend;
+  scheduleEnemy(E.d.headCd);
+
+  restart(fe, 'buzzShake');
+  sfx.buzzCut();
+  bzUnderFx();
+
+  setTimeout(() => {
+    if(over) return;
+    const e = center(fe), t = center(fp);
+    for(let i = 0; i < 6; i++){
+      const from = { x:e.x + rnd(-70,70), y:e.y + rnd(40,70) };
+      const to = { x:t.x + rnd(-60,60), y:t.y + rnd(-50,50) };
+      arcFly('bzRock', from, to, 480 + rnd(0,120), rnd(60,140), 'bzFire', () => {
+        if(over) return;
+        dustCloud(fp, 2);
+        particle('bzSpark', to.x, to.y, rnd(-60,60), rnd(-60,20), 380);
+      });
+    }
+  }, 120);
+
+  setTimeout(() => {
+    if(over || pend.cancelled) return;
+    pend.landed = true;
+    const c = center(fp);
+    const ang = -24 + rnd(-6, 6);
+    restart(fp, 'shake');
+    sfx.bzSweep();
+    bzSlashSweep(c, ang);
+
+    setTimeout(() => {
+      if(over) return;
+      sfx.bzHit();
+      restart($('#arena'), 'quake');
+      bzSlashBurst(c);
+      smokeAt(fp, 170);
+      damagePlayer(rnd(458, 678), '#fb923c');
+    }, 300);
+  }, 450);
+};const LS_SW = 'https://www.dropbox.com/scl/fi/im7wuv08x6zeatdimvujg/slash-sword.mp3?rlkey=jyhceob7ww1sdlql21ieefhxk&st=jnwsn9x4&dl=1';
+const LS_HIT = 'https://www.dropbox.com/scl/fi/wezbxy0ubwifgcc693e53/sword-slash_NkdUSLZ.mp3?rlkey=krvbrrsg9hyyhj4bmmy1g5isj&st=xzsa8j0a&dl=1';
+
+A.chars["LargeTvHare 2.0"] = {
+  icon:'https://www.dropbox.com/scl/fi/hoqu8e0x9t59zfbigsqex/Picsart_26-11-06_16-02-10-217.jpg?rlkey=2wtjlhhuxnu5z92ks8s8o67zi&st=76bfdc7u&dl=1',
+  model:'https://www.dropbox.com/scl/fi/yveqo75rdrhfmxka9kejx/IMG_20261106_155321_687.png?rlkey=wrnur216iad23ht4ctxn7543a&st=ez17hjp5&dl=1',
+  bsModel:'https://www.dropbox.com/scl/fi/yveqo75rdrhfmxka9kejx/IMG_20261106_155321_687.png?rlkey=wrnur216iad23ht4ctxn7543a&st=ez17hjp5&dl=1',
+  info:'Забыл как его звут, вроде как Тимофей.',
+  abil:'Slash-Sword, Detainer, Pulse-Lasers, BlindScreen V2, Cosmic-Block V2',
+  hp:2550, stars:'☆☆☆☆', cd:14000,
+  abl:['Slash-Sword','Detainer','Pulse-Lasers','BlindScreen V2','Cosmic-Block V2'],
+  pun:[25,45]
+};
+
+buildIcons($('#charIcons'), A.chars, key => {
+  sel.char = key;
+  renderCard($('#charCard'), key, A.chars[key], 'char', 'Начать', () => {
+    go('pvp', () => {
+      sel.enemy = null; $('#enemyCard').innerHTML = '';
+      $('#enemyIcons').querySelectorAll('.ico').forEach(i => i.classList.remove('sel'));
+    });
+  });
+});
+
+(function(){
+  const ab = $('#abil');
+  if(!ab.querySelector('[data-ab="A5"]')){
+    const b = document.createElement('button');
+    b.className = 'ab'; b.dataset.ab = 'A5'; b.textContent = 'A5';
+    ab.appendChild(b);
+  }
+})();
+
+const ltStyle = document.createElement('style');
+ltStyle.textContent = `
+#abil.on .ab:nth-child(5){transition-delay:.32s}
+#abil.five{flex-wrap:wrap;justify-content:center;gap:4px;width:min(82vw,330px);top:-130px}
+#abil.five .ab{width:min(26vw,104px);height:40px;font-size:10px;white-space:normal;line-height:1.05}
+@media(max-width:700px){#abil.five{left:calc(50% + 17vw)}}
+@media(min-width:701px){#abil.five{flex-wrap:nowrap;width:auto;top:-86px}#abil.five .ab{width:84px}}
+.lsSword{position:fixed;left:0;top:0;width:120px;height:26px;margin:-13px 0 0 -60px;background:linear-gradient(90deg,#374151 0 20%,#1f2937 20% 26%,#d1d5db 26% 45%,#9ca3af 45% 100%);clip-path:polygon(0 40%,8% 40%,8% 20%,14% 20%,14% 40%,22% 40%,26% 0,32% 30%,40% 22%,44% 0,52% 30%,60% 22%,64% 0,72% 30%,100% 50%,72% 70%,64% 100%,60% 78%,52% 70%,44% 100%,40% 78%,32% 70%,26% 100%,22% 60%,14% 60%,14% 80%,8% 80%,8% 60%,0 60%);filter:drop-shadow(0 0 6px #a855f7) drop-shadow(0 0 2px #fff);z-index:174;pointer-events:none}
+.ldOrb{position:fixed;left:0;top:0;width:54px;height:54px;margin:-27px 0 0 -27px;border-radius:50%;background:radial-gradient(circle,#fff,#c084fc 45%,#3b0764 80%,rgba(0,0,0,0));box-shadow:0 0 24px #a855f7,0 0 10px #fff;z-index:174;pointer-events:none;animation:jit .3s linear infinite}
+`;
+document.head.appendChild(ltStyle);
+
+function swordFly(a, b, dur, arc, spins, onDone){
+  const el = document.createElement('div'); el.className = 'lsSword';
+  document.body.appendChild(el);
+  const kf = [];
+  for(let i = 0; i <= 14; i++){
+    const t = i / 14, p = bez(a, b, arc, t);
+    kf.push({ transform:`translate(${p.x}px,${p.y}px) rotate(${t * 360 * spins}deg)`, offset:t });
+  }
+  el.animate(kf, { duration:dur, easing:'linear', fill:'forwards' }).onfinish = () => { el.remove(); if(onDone) onDone(); };
+  const t0 = performance.now();
+  const iv = setInterval(() => {
+    const t = Math.min(1, (performance.now() - t0) / dur), p = bez(a, b, arc, t);
+    if(Math.random() < 0.5) particle('zsmoke2', p.x, p.y, rnd(-20,20), rnd(-20,20), 600, rnd(30,70));
+    else particle('zdot', p.x, p.y, rnd(-25,25), rnd(-25,25), 450);
+    if(t >= 1) clearInterval(iv);
+  }, 35);
+}
+function lsCut(c, ang, big){
+  const mk = (cls, dx, dy, a, dur) => {
+    const s = document.createElement('div'); s.className = cls;
+    s.style.left = (c.x + dx) + 'px'; s.style.top = (c.y + dy) + 'px';
+    s.style.transform = `translate(-50%,-50%) rotate(${a}deg)`;
+    document.body.appendChild(s); setTimeout(() => s.remove(), dur);
+  };
+  mk('slashPg', 0, 0, ang, 760);
+  mk('slashPb', 0, 3, ang, 560);
+  mk('slashP', 0, 0, ang, 600);
+  mk('slashP2', 16, -10, ang + 4, 560);
+  mk('slashP2', -12, 12, ang - 3, 560);
+  restart($('#fE'), 'jit');
+  restart($('#arena'), 'quake');
+  zBurst(c, big);
+  for(let i = 0; i < (big ? 14 : 8); i++) particle('zfire', c.x + rnd(-60,60), c.y + rnd(-30,50), rnd(-40,40), -rnd(60,140), 700 + rnd(0,400), rnd(14,30));
+  for(let i = 0; i < 14; i++) particle(i % 2 ? 'zspark' : 'zdot', c.x + rnd(-80,80), c.y + rnd(-60,50), rnd(-110,110), rnd(-110,60), 600 + rnd(0,500));
+  for(let i = 0; i < 5; i++) particle('zsmoke', c.x + rnd(-70,70), c.y + rnd(-60,60), rnd(-50,50), rnd(-70,-10), 1000 + rnd(0,500), rnd(80,150));
+  dustBig(c, 5);
+  smokeAt($('#fE'), 190);
+  notes(c, 3, PURPLE);
+}
+function slashSword(){
+  playSnd('lsSw', LS_SW, 1.3);
+  const fp = $('#fP');
+  restart(fp, 'lunge');
+  restart($('#arena'), 'quake');
+  const p = center(fp);
+  zBurst(p, true);
+  dustBig(p, 8);
+  for(let i = 0; i < 8; i++) particle('zsmoke', p.x + rnd(-60,60), p.y + rnd(-50,50), rnd(-70,70), rnd(-60,-10), 900 + rnd(0,400), rnd(90,160));
+  setTimeout(() => {
+    if(over) return;
+    const a = center(fp), b = center($('#fE'));
+    swordFly(a, b, 520, 90, 3, () => {
+      if(over) return;
+      const c = center($('#fE'));
+      playSnd('lsHit', LS_HIT, 1.4);
+      lsCut(c, -30, false);
+      damageEnemy(rnd(890, 1120));
+      setTimeout(() => {
+        if(over) return;
+        lsCut(c, 26, true);
+        damageEnemy(rnd(890, 1236));
+        setTimeout(() => {
+          if(over) return;
+          swordFly(center($('#fE')), center(fp), 520, -60, 3, () => {
+            if(over) return;
+            const q = center(fp);
+            particle('flash p', q.x, q.y, 0, 0, 260, 90);
+            shockRing(q, 'rgba(192,132,252,.9)');
+            zfx(q, 8, 50);
+          });
+        }, 160);
+      }, 230);
+    });
+  }, 180);
+}
+
+function detainer(){
+  const fp = $('#fP'), DUR = 3000, end = Date.now() + DUR;
+  P.detainUntil = end;
+  restart(fp, 'jit');
+  fp.classList.add('tremble');
+  setAura($('#aura'), 'z');
+  sfx.boost();
+  zBurst(center(fp), false);
+  const iv = setInterval(() => {
+    if(over || Date.now() > end){ clearInterval(iv); return; }
+    const c = center(fp);
+    particle('zfire', c.x + rnd(-60,60), c.y + rnd(-10,60), rnd(-20,20), -rnd(60,130), 700 + rnd(0,300), rnd(16,32));
+    particle('zsmoke', c.x + rnd(-70,70), c.y + rnd(-60,50), rnd(-30,30), -rnd(40,100), 1000 + rnd(0,400), rnd(80,140));
+    particle('puff', c.x + rnd(-60,60), c.y + rnd(0,60), rnd(-30,30), -rnd(20,60), 800, rnd(50,100));
+    particle('zdot', c.x + rnd(-70,70), c.y + rnd(-70,50), rnd(-30,30), rnd(-60,10), 500);
+    if(Math.random() < 0.5) particle('mote', c.x + rnd(-70,70), c.y + rnd(-60,60), rnd(-20,20), rnd(-60,-15), 1200, rnd(3,6));
+  }, 90);
+  setTimeout(() => {
+    clearInterval(iv);
+    fp.classList.remove('tremble');
+    setAura($('#aura'), null);
+  }, DUR);
+}
+function detainCatch(){
+  const fp = $('#fP'), q = center(fp);
+  floatText(fp, 'CAUGHT', '#e9d5ff');
+  sfx.block();
+  for(let i = 0; i < 16; i++){
+    const a = i / 16 * Math.PI * 2, r = 150;
+    particle('zdot', q.x + Math.cos(a) * r, q.y + Math.sin(a) * r, -Math.cos(a) * r, -Math.sin(a) * r, 420);
+  }
+  shockRing(q, 'rgba(192,132,252,.9)');
+  const orb = document.createElement('div'); orb.className = 'ldOrb';
+  orb.style.left = q.x + 'px'; orb.style.top = q.y + 'px';
+  document.body.appendChild(orb);
+  orb.animate([{ scale:.2, opacity:.4 }, { scale:1.4, opacity:1 }], { duration:600, fill:'forwards' });
+  const tv = setInterval(() => {
+    const c = center(fp);
+    particle('zspark', c.x + rnd(-40,40), c.y + rnd(-40,40), rnd(-60,60), rnd(-70,20), 400);
+    particle('puff', c.x + rnd(-40,40), c.y + rnd(-30,40), rnd(-30,30), -rnd(20,50), 600, rnd(40,80));
+  }, 60);
+  setTimeout(() => {
+    clearInterval(tv); orb.remove();
+    if(over) return;
+    sfx.zapBig();
+    arcFly('ldOrb', center(fp), center($('#fE')), 380, 30, 'zdot', () => {
+      if(over) return;
+      const e = center($('#fE'));
+      impactFx($('#fE'), 'purple');
+      zBurst(e, true);
+      restart($('#arena'), 'quake');
+      damageEnemy(1899);
+    });
+  }, 700);
+}
+function detainLaser(){
+  P.laserRedirectUntil = Date.now() + 5000;
+  const fp = $('#fP');
+  floatText(fp, 'REDIRECT', '#e9d5ff');
+  const a = center(fp), b = center($('#fE'));
+  const beam = makeZBeam(a.x + 30, a.y - 20, b.x, b.y);
+  sfx.laserBuzz(5);
+  let n = 0;
+  const iv = setInterval(() => {
+    if(over || ++n > 10){ clearInterval(iv); beam.remove(); return; }
+    damageEnemy(rnd(110, 140));
+    zfx(center($('#fE')), 8, 60);
+  }, 500);
+  setTimeout(() => beam.remove(), 5000);
+}
+
+const _dmgPlLT = damagePlayer;
+damagePlayer = function(dmg, color){
+  if(!over && P && P.d && P.d.abl && P.d.abl.indexOf('Detainer') >= 0){
+    const now = Date.now();
+    const laser = color === '#fde047' && dmg === 15;
+    const bullet = color === '#fde047' && dmg === 45;
+    const rocket = color === '#fb923c' && dmg <= 359;
+    const acid = color === '#84cc16';
+    if(laser && now < (P.laserRedirectUntil || 0)) return;
+    if(laser && now < (P.detainUntil || 0)){ detainLaser(); return; }
+    if((bullet || rocket || acid) && now < (P.detainUntil || 0) && !(P.shieldUntil && now < P.shieldUntil)){
+      if(acid) P.dotImmuneUntil = now + 9000;
+      detainCatch();
+      return;
+    }
+  }
+  return _dmgPlLT(dmg, color);
+};
+const _dotPlLT = dotPlayer;
+dotPlayer = function(d){
+  if(P && P.dotImmuneUntil && Date.now() < P.dotImmuneUntil) return;
+  _dotPlLT(d);
+};
+
+function pulseLasers(){
+  const fp = $('#fP');
+  restart(fp, 'shake');
+  sfx.laserCharge();
+  zBurst(center(fp), false);
+  let n = 0;
+  const iv = setInterval(() => {
+    if(over || ++n > 6){ clearInterval(iv); return; }
+    const a = center(fp), b = center($('#fE'));
+    const bm = [-22, 0, 22].map(o => makeZBeam(a.x + 30, a.y + o, b.x, b.y + o * 0.6));
+    sfx.zapBig();
+    restart($('#arena'), 'quake');
+    zfx(b, 8, 60);
+    damageEnemy(rnd(120, 170));
+    setTimeout(() => bm.forEach(x => x.remove()), 180);
+  }, 420);
+}
+
+const _useAbilityLT = useAbility;
+useAbility = function(name){
+  const map = {
+    'Slash-Sword': slashSword,
+    'Detainer': detainer,
+    'Pulse-Lasers': pulseLasers,
+    'BlindScreen V2': blindScreen,
+    'Cosmic-Block V2': cosmicBlock
+  };
+  if(map[name]){
+    if(!abilOpen || over) return;
+    hideAbilities();
+    return map[name]();
+  }
+  return _useAbilityLT(name);
+};
+
+const _startFightLT = startFight;
+startFight = function(){
+  if(!sel.char || !sel.enemy) return;
+  const isLT = sel.char === 'LargeTvHare 2.0';
+  if(isLT){ loadSnd('lsSw', LS_SW); loadSnd('lsHit', LS_HIT); }
+  _startFightLT();
+  if(!P) return;
+  P.detainUntil = 0; P.laserRedirectUntil = 0; P.dotImmuneUntil = 0;
+  $('#abil').classList.toggle('five', isLT);
+  if(isLT) $('#pWrap').style.width = 'min(58vw,377px)';
+};const LP_SND = 'https://www.dropbox.com/scl/fi/rcdzwlzrq0dx5795y7jwq/gman-lasers.mp3?rlkey=tgcur5ovx02p4o3o6dy2jzqha&st=yjdwmeeh&dl=1';
+const BV2_SND = 'https://www.dropbox.com/scl/fi/vg4296zirofo9js6glw7h/lv_0_20261106163434.mp3?rlkey=5id6knhxein3cjzlejhyxk0kl&st=kbs2mkg9&dl=1';
+
+const lt2Style = document.createElement('style');
+lt2Style.textContent = `
+@keyframes weakGlitch{0%,100%{transform:translate(0,0)}25%{transform:translate(-2.5px,1px) skewX(1deg)}50%{transform:translate(2.5px,-1px)}75%{transform:translate(-1px,-.5px) skewX(-1deg)}}
+.weakGlitch{animation:weakGlitch .09s linear infinite}
+@keyframes cbDrift{0%,100%{scale:.95;rotate:0deg}50%{scale:1.08;rotate:6deg}}
+@keyframes cbDrift2{0%,100%{scale:1.05;rotate:0deg}50%{scale:.92;rotate:-8deg}}
+.cbFog{position:absolute;left:-30%;right:-30%;top:-15%;bottom:-8%;border-radius:50%;background:radial-gradient(circle at 42% 45%,rgba(124,58,237,.6),rgba(46,16,101,.7) 40%,rgba(10,0,20,.55) 62%,rgba(0,0,0,0) 74%);filter:blur(6px);opacity:0;transition:opacity .9s ease;pointer-events:none;z-index:2;animation:cbDrift 2.4s ease-in-out infinite}
+.cbFog2{left:-40%;right:-20%;top:-5%;bottom:-14%;background:radial-gradient(circle at 55% 55%,rgba(168,85,247,.45),rgba(30,8,60,.65) 45%,rgba(0,0,0,0) 72%);animation:cbDrift2 3.1s ease-in-out infinite}
+.cbFog.on{opacity:1}
+`;
+document.head.appendChild(lt2Style);
+
+function setBeam(d, x1, y1, x2, y2){
+  const len = Math.hypot(x2 - x1, y2 - y1), ang = Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI;
+  d.style.left = x1 + 'px'; d.style.top = y1 + 'px'; d.style.width = len + 'px';
+  d.style.transform = `rotate(${ang}deg)`;
+}
+
+/* Pulse-Lasers: два фиолетовых луча, 50 урона каждые 500 мс, 8 секунд. Потом заблокирована до успешного Detainer */
+function pulseLasers(){
+  const fp = $('#fP'), fe = $('#fE'), DUR = 8000, end = Date.now() + DUR;
+  P.pulseLocked = true;
+  updateLock();
+  playSnd('lsLaser', LP_SND, 1.4);
+  restart(fp, 'shake');
+  const a0 = center(fp);
+  zBurst(a0, true);
+  restart($('#arena'), 'quake');
+  const offs = [-16, 16];
+  const beams = offs.map(o => {
+    const b = center(fe);
+    const d = makeZBeam(a0.x + 30, a0.y + o - 10, b.x, b.y + o * 0.6);
+    d.style.height = '30px'; d.style.marginTop = '-15px';
+    return d;
+  });
+  fe.classList.add('weakGlitch');
+  setAura($('#eaura'), 'z');
+  let done = false;
+  function cleanup(){
+    if(done) return; done = true;
+    clearInterval(fxIv); clearInterval(dmgIv);
+    beams.forEach(b => b.remove());
+    fe.classList.remove('weakGlitch');
+    setAura($('#eaura'), null);
+  }
+  const fxIv = setInterval(() => {
+    if(over || Date.now() > end){ cleanup(); return; }
+    const a = center(fp), b = center(fe);
+    beams.forEach((d, i) => setBeam(d, a.x + 30, a.y + offs[i] - 10, b.x, b.y + offs[i] * 0.6));
+    zfx(a, 3, 50);
+    particle('zspark', a.x + 30 + rnd(-10,10), a.y + rnd(-30,10), rnd(-40,60), rnd(-50,30), 400);
+    /* горящий фиолетовым пламенем враг */
+    for(let i = 0; i < 2; i++) particle('zfire', b.x + rnd(-55,55), b.y + rnd(0,60), rnd(-15,15), -rnd(60,150), 700 + rnd(0,400), rnd(16,34));
+    particle('zsmoke', b.x + rnd(-60,60), b.y + rnd(-40,50), rnd(-40,40), -rnd(60,120), 1000 + rnd(0,500), rnd(80,150));
+    particle('zsmoke2', b.x + rnd(-60,60), b.y + rnd(-40,50), rnd(-30,30), -rnd(50,100), 900 + rnd(0,400), rnd(70,130));
+    particle('zspark', b.x + rnd(-60,60), b.y + rnd(-60,60), rnd(-90,90), rnd(-110,30), 450 + rnd(0,300));
+    particle('zdot', b.x + rnd(-60,60), b.y + rnd(-60,60), rnd(-80,80), rnd(-90,30), 500);
+    particle('bzFire', b.x + rnd(-50,50), b.y + rnd(10,60), rnd(-30,30), -rnd(50,110), 600 + rnd(0,300), rnd(10,20));
+    particle('puff', b.x + rnd(-50,50), b.y + rnd(-30,50), rnd(-40,40), -rnd(30,80), 800 + rnd(0,300), rnd(50,110));
+    if(Math.random() < 0.4) particle('mote', b.x + rnd(-60,60), b.y + rnd(-50,60), rnd(-20,20), -rnd(40,90), 1200, rnd(3,6));
+    if(Math.random() < 0.25) shockRing(b, 'rgba(192,132,252,.7)');
+  }, 80);
+  let n = 0;
+  const dmgIv = setInterval(() => {
+    if(over || ++n > 16){ clearInterval(dmgIv); return; }
+    sfx.zapBig();
+    damageEnemy(50);
+    const b = center(fe);
+    restart($('#arena'), 'quake');
+    zfx(b, 6, 60);
+    smokeAt(fe, 140);
+  }, 500);
+  setTimeout(cleanup, DUR);
+}
+
+/* Blind-Screen V2: через 2 сек ослепление на 3 сек с плавным угасанием, лучи 50 урона каждые 300 мс 10 сек, враг дрожит и не атакует */
+function blindScreenV2(){
+  const fp = $('#fP'), fe = $('#fE');
+  playSnd('lsBlind', BV2_SND, 1.4);
+  const FLASH = 2000, DMGDUR = 10000;
+  const flashStart = Date.now() + FLASH, dmgEnd = flashStart + DMGDUR;
+  E.stunUntil = dmgEnd;
+  if(E.pending && !E.pending.landed) E.pending.cancelled = true;
+  scheduleEnemy(dmgEnd - Date.now() + 150);
+  fp.classList.add('tremble');
+  restart(fp, 'greenBlink');
+  /* зарядка перед вспышкой: свет собирается вокруг */
+  const chIv = setInterval(() => {
+    if(over || Date.now() >= flashStart){ clearInterval(chIv); return; }
+    const c = center(fp);
+    for(let i = 0; i < 3; i++){
+      const ang = Math.random() * Math.PI * 2, r = rnd(90,150);
+      particle('mote', c.x + Math.cos(ang) * r, c.y + Math.sin(ang) * r, -Math.cos(ang) * r, -Math.sin(ang) * r, 600, rnd(4,9));
+    }
+    if(Math.random() < 0.4) particle('flash', c.x + rnd(-40,40), c.y + rnd(-50,40), 0, 0, 300, rnd(40,90));
+  }, 90);
+  setTimeout(() => {
+    clearInterval(chIv);
+    if(over){ fp.classList.remove('tremble'); return; }
+    const w = $('#whiteFlash');
+    w.animate([
+      { opacity:0 },
+      { opacity:1, offset:0.083 },
+      { opacity:1, offset:0.708 },
+      { opacity:0 }
+    ], { duration:4800, easing:'ease-in-out' });
+    fe.classList.add('tremble');
+    restart($('#arena'), 'quake');
+    zBurst(center(fp), true);
+    particle('flash', center(fp).x, center(fp).y, 0, 0, 500, 260);
+    let done = false;
+    function cleanup(){
+      if(done) return; done = true;
+      clearInterval(rayIv); clearInterval(dmgIv);
+      fp.classList.remove('tremble'); fe.classList.remove('tremble');
+    }
+    const rayIv = setInterval(() => {
+      if(over || Date.now() > dmgEnd){ cleanup(); return; }
+      const c = center(fp), e = center(fe);
+      for(let i = 0; i < 2; i++) ray(c.x + rnd(-30,30), c.y + rnd(-50,30), e.x + rnd(-40,40), e.y + rnd(-40,40), 260);
+      const ang = Math.random() * Math.PI * 2, L = rnd(220,420);
+      ray(c.x, c.y, c.x + Math.cos(ang) * L, c.y + Math.sin(ang) * L, 320);
+      particle('mote', c.x + rnd(-60,60), c.y + rnd(-60,40), rnd(-80,80), rnd(-90,30), 800, rnd(4,9));
+      if(Math.random() < 0.5) particle('puff', e.x + rnd(-40,40), e.y + rnd(-40,40), rnd(-30,30), rnd(-40,-10), 500, rnd(40,90));
+      if(Math.random() < 0.3) particle('flash', e.x + rnd(-50,50), e.y + rnd(-50,50), 0, 0, 260, rnd(50,100));
+    }, 120);
+    let n = 0;
+    const dmgIv = setInterval(() => {
+      if(over || Date.now() > dmgEnd){ cleanup(); return; }
+      damageEnemy(50);
+      if(n++ % 2 === 0) smokeAt(fe, 130);
+    }, 300);
+    setTimeout(cleanup, DMGDUR + 100);
+  }, FLASH);
+}
+
+/* Cosmic-Block V2: густой фиолетовый дым 10 секунд, весь урон врага отражается обратно на врага */
+function cosmicBlockV2(){
+  const fp = $('#fP'), wrap = $('#pWrap'), DUR = 10000, end = Date.now() + DUR;
+  playSnd('saw', SAW_SND, 1.3);
+  P.reflectUntil = end;
+  const fogs = [document.createElement('div'), document.createElement('div')];
+  fogs[0].className = 'cbFog'; fogs[1].className = 'cbFog cbFog2';
+  fogs.forEach(f => wrap.appendChild(f));
+  void wrap.offsetWidth;
+  fogs.forEach(f => f.classList.add('on'));
+  fp.classList.add('tremble');
+  const c0 = center(fp);
+  zBurst(c0, true);
+  shieldRipple(c0);
+  dustBig(c0, 10);
+  restart($('#arena'), 'quake');
+  let done = false;
+  function cleanup(){
+    if(done) return; done = true;
+    clearInterval(iv);
+    fp.classList.remove('tremble');
+    fogs.forEach(f => f.classList.remove('on'));
+    setTimeout(() => fogs.forEach(f => f.remove()), 1000);
+    if(!over){
+      const c = center(fp);
+      for(let i = 0; i < 8; i++) particle('zsmoke', c.x + rnd(-70,70), c.y + rnd(-70,50), rnd(-80,80), rnd(-90,-20), 800 + rnd(0,400), rnd(90,160));
+      shockRing(c, 'rgba(192,132,252,.8)');
+    }
+  }
+  const iv = setInterval(() => {
+    if(over || Date.now() > end){ cleanup(); return; }
+    const c = center(fp);
+    for(let i = 0; i < 3; i++) particle('zsmoke', c.x + rnd(-95,95), c.y + rnd(-100,60), rnd(-35,35), rnd(-55,-8), 1400 + rnd(0,800), rnd(100,200));
+    particle('zsmoke2', c.x + rnd(-80,80), c.y + rnd(-80,50), rnd(-30,30), rnd(-40,-5), 1200 + rnd(0,500), rnd(80,150));
+    particle('dsmoke', c.x + rnd(-80,80), c.y + rnd(-70,50), rnd(-30,30), rnd(-50,-10), 1000 + rnd(0,500), rnd(80,150));
+    particle('zspark', c.x + rnd(-80,80), c.y + rnd(-90,60), rnd(-40,40), rnd(-70,10), 500 + rnd(0,300));
+    particle('zdot', c.x + rnd(-80,80), c.y + rnd(-90,60), rnd(-30,30), rnd(-50,20), 600 + rnd(0,400));
+    if(Math.random() < 0.5) particle('mote', c.x + rnd(-90,90), c.y + rnd(-80,70), rnd(-20,20), rnd(-60,-15), 1400, rnd(3,6));
+    if(Math.random() < 0.3) shieldRipple(c);
+  }, 90);
+  setTimeout(cleanup, DUR + 50);
+}
+function reflectHit(dmg){
+  const fp = $('#fP'), q = center(fp);
+  sfx.block();
+  shockRing(q, 'rgba(192,132,252,.9)');
+  floatText(fp, 'REFLECT', '#e9d5ff');
+  particle('flash p', q.x, q.y, 0, 0, 240, 90);
+  setTimeout(() => {
+    if(over) return;
+    arcFly('ldOrb', center(fp), center($('#fE')), 360, 30, 'zdot', () => {
+      if(over) return;
+      impactFx($('#fE'), 'purple');
+      zBurst(center($('#fE')), false);
+      damageEnemy(dmg);
+    });
+  }, 120);
+}
+
+const _dmgPlCB = damagePlayer;
+damagePlayer = function(dmg, color){
+  if(!over && P && P.reflectUntil && Date.now() < P.reflectUntil){
+    reflectHit(dmg);
+    return;
+  }
+  return _dmgPlCB(dmg, color);
+};
+const _dotPlCB = dotPlayer;
+dotPlayer = function(d){
+  if(!over && P && P.reflectUntil && Date.now() < P.reflectUntil){
+    damageEnemy(d);
+    return;
+  }
+  _dotPlCB(d);
+};
+
+/* Pulse-Lasers разблокируется после успешного Detainer */
+const _detainCatchLT2 = detainCatch;
+detainCatch = function(){
+  if(P){ P.pulseLocked = false; updateLock(); }
+  return _detainCatchLT2();
+};
+const _detainLaserLT2 = detainLaser;
+detainLaser = function(){
+  if(P){ P.pulseLocked = false; updateLock(); }
+  return _detainLaserLT2();
+};
+
+const _updateLockLT2 = updateLock;
+updateLock = function(){
+  _updateLockLT2();
+  if(!P) return;
+  const b = $('#abil').querySelector('[data-ab="Pulse-Lasers"]');
+  if(!b) return;
+  const lk = !!P.pulseLocked;
+  b.classList.toggle('locked', lk);
+  b.textContent = lk ? 'Pulse-Lasers\nНужен Detainer' : 'Pulse-Lasers';
+};
+
+const _useAbilityLT2 = useAbility;
+useAbility = function(name){
+  if(P && P.d === A.chars['LargeTvHare 2.0']){
+    if(name === 'Pulse-Lasers'){
+      if(!abilOpen || over) return;
+      if(P.pulseLocked){
+        floatText($('#fP'), 'Нужен успешный Detainer', '#c4b5fd');
+        return;
+      }
+      hideAbilities();
+      return pulseLasers();
+    }
+    if(name === 'BlindScreen V2'){
+      if(!abilOpen || over) return;
+      hideAbilities();
+      return blindScreenV2();
+    }
+    if(name === 'Cosmic-Block V2'){
+      if(!abilOpen || over) return;
+      hideAbilities();
+      return cosmicBlockV2();
+    }
+  }
+  return _useAbilityLT2(name);
+};
+
+const _startFightLT2 = startFight;
+startFight = function(){
+  if(!sel.char || !sel.enemy) return;
+  if(sel.char === 'LargeTvHare 2.0'){
+    loadSnd('lsLaser', LP_SND);
+    loadSnd('lsBlind', BV2_SND);
+    loadSnd('saw', SAW_SND);
+  }
+  _startFightLT2();
+  if(!P) return;
+  P.pulseLocked = false; P.reflectUntil = 0;
+  document.querySelectorAll('.cbFog').forEach(f => f.remove());
+  $('#fE').classList.remove('weakGlitch');
+  updateLock();
+};const BV2_URL = 'https://www.dropbox.com/scl/fi/vg4296zirofo9js6glw7h/lv_0_20261106163434.mp3?rlkey=5id6knhxein3cjzlejhyxk0kl&st=8q79uoju&dl=1';
+
+/* ===== Мгновенный звук: файлы заранее загружены в память, без задержки при нажатии ===== */
+const _preSnd = {};
+function preSnd(url){
+  if(_preSnd[url]) return;
+  const a = new Audio(url);
+  a.preload = 'auto';
+  a.load();
+  _preSnd[url] = a;
+}
+preSnd(BV2_URL);
+preSnd(SAW_SND);
+preSnd(LP_SND);
+
+playSnd = function(name, url, vol){
+  const buf = SND[name];
+  if(buf){
+    const c = ctx(), s = c.createBufferSource(), g = c.createGain();
+    s.buffer = buf; g.gain.value = vol || 1;
+    s.connect(g).connect(c.destination); s.start();
+    return;
+  }
+  preSnd(url);
+  const base = _preSnd[url];
+  let a = base;
+  if(!base.paused && base.currentTime > 0) a = base.cloneNode();
+  a.volume = Math.min(1, vol || 1);
+  try{ a.currentTime = 0; }catch(e){}
+  a.play().catch(() => {});
+};
+
+/* ===== Слабая тряска экрана ===== */
+const softShakeStyle = document.createElement('style');
+softShakeStyle.textContent = `
+@keyframes quakeSoft{0%,100%{transform:translate(0)}20%{transform:translate(-2px,1px)}40%{transform:translate(2px,-1px)}60%{transform:translate(-1px,1px)}80%{transform:translate(1px,0)}}
+#arena.quakeSoft{animation:quakeSoft .22s linear}
+`;
+document.head.appendChild(softShakeStyle);
+
+function softShake(ms){
+  const ar = $('#arena'), end = Date.now() + ms;
+  const iv = setInterval(() => {
+    if(over || Date.now() > end){ clearInterval(iv); ar.classList.remove('quakeSoft'); return; }
+    ar.classList.remove('quakeSoft'); void ar.offsetWidth; ar.classList.add('quakeSoft');
+  }, 230);
+}
+
+/* BlindScreen V2: звук срабатывает сразу при нажатии, плюс слабая тряска экрана */
+const _blindV2Orig = blindScreenV2;
+blindScreenV2 = function(){
+  playSnd('lsBlind', BV2_URL, 1.5);
+  softShake(5200);
+  return _blindV2Orig();
+};
+
+const _startFightLT3 = startFight;
+startFight = function(){
+  if(sel.char === 'LargeTvHare 2.0'){
+    preSnd(BV2_URL); preSnd(SAW_SND); preSnd(LP_SND);
+    loadSnd('lsBlind', BV2_URL);
+    loadSnd('saw', SAW_SND);
+    loadSnd('lsLaser', LP_SND);
+  }
+  return _startFightLT3();
+};const GH_ICON = 'https://www.dropbox.com/scl/fi/ql1982wm2vis5pfu7evn5/Picsart_26-11-06_19-34-47-309.png?rlkey=ni0p5y2r9tg2gfojyixw4d8ht&st=ni0p5y2r9tg2gfojyixw4d8ht&dl=1';
+const GH_MODEL = 'https://www.dropbox.com/scl/fi/yx4ywoja7bnjkp8e5hs9e/Picsart_26-11-06_19-29-12-890.png?rlkey=6errnrkfisr53xes6mumqzcbf&st=rk8h55wd&dl=1';
+const GH_LMODEL = 'https://www.dropbox.com/scl/fi/fqiv4vebf8lxhnk4tybqb/Picsart_26-11-06_19-30-06-712.png?rlkey=0n2kpdqk1ryedkdb80box1kh4&st=3demczra&dl=1';
+const GH_LASER = 'https://www.dropbox.com/scl/fi/rcdzwlzrq0dx5795y7jwq/gman-lasers.mp3?rlkey=tgcur5ovx02p4o3o6dy2jzqha&st=wzme6wqi&dl=1';
+const GH_THEME = 'https://www.dropbox.com/scl/fi/niok3gs1juulmhn7ei7xw/skibidi-gman-theme-made-with-Voicemod.mp3?rlkey=jmh6jaq2bytywcxdud7oig6x0&st=5w04ends&dl=1';
+
+A.enemies["G-Hare 1.0"] = {
+  icon: GH_ICON.replace('st=ni0p5y2r9tg2gfojyixw4d8ht','st=ni0p5y2r9tg2gfojyixw4d8ht'),
+  model: GH_MODEL,
+  lsModel: GH_LMODEL,
+  info: 'Прошу прощения, командир.',
+  abil: 'HeadButt V2, Lasers V2',
+  hp: 5500, stars: '☆☆☆☆',
+  head: [1250, 1890], headCd: 25000,
+  gh: true, titan: true
+};
+
+const ghStyle = document.createElement('style');
+ghStyle.textContent = `
+#pWrap{z-index:4}
+.titanTag{font-size:20px;font-weight:900;letter-spacing:5px;color:#ff1744;-webkit-text-stroke:1.5px #000;paint-order:stroke fill;text-shadow:0 0 0 #000,2px 2px 0 #000,-2px -2px 0 #000,2px -2px 0 #000,-2px 2px 0 #000,0 0 12px rgba(255,23,68,.7);margin-bottom:2px}
+.ghBeam{position:fixed;left:0;top:0;height:64px;margin-top:-32px;transform-origin:0 50%;border-radius:32px;background:linear-gradient(180deg,rgba(250,204,21,0),rgba(250,204,21,.65) 28%,#fffbe0 50%,rgba(250,204,21,.65) 72%,rgba(250,204,21,0));filter:drop-shadow(0 0 14px #facc15) drop-shadow(0 0 30px #f59e0b);z-index:171;pointer-events:none;animation:zbeamPulse .08s linear infinite alternate}
+`;
+document.head.appendChild(ghStyle);
+
+const _renderCardGH = renderCard;
+renderCard = function(el, name, d, kind, btnText, onBtn){
+  _renderCardGH(el, name, d, kind, btnText, onBtn);
+  if(d.titan){
+    const n = el.querySelector('.pname');
+    if(n) n.insertAdjacentHTML('beforebegin', '<div class="titanTag">ТИТАН</div>');
+  }
+};
+
+buildIcons($('#enemyIcons'), A.enemies, key => {
+  sel.enemy = key;
+  renderCard($('#enemyCard'), key, A.enemies[key], 'enemy', 'СТАРТ', startFight);
+});
+
+preSnd(GH_LASER);
+(new Image()).src = GH_LMODEL;
+(new Image()).src = GH_MODEL;
+
+function ghLasers(){
+  if(over) return;
+  const fe = $('#fE'), fp = $('#fP');
+  scheduleEnemy(E.d.headCd);
+  playSnd('ghLaser', GH_LASER, 1.5);
+  fe.classList.add('tremble');
+  const chIv = setInterval(() => {
+    if(over){ clearInterval(chIv); fe.classList.remove('tremble'); return; }
+    const c = center(fe);
+    for(let i = 0; i < 3; i++){
+      particle('bzSpark', c.x + rnd(-120,120), c.y + rnd(-150,120), rnd(-90,90), rnd(-110,40), 500 + rnd(0,300));
+      particle('spark', c.x + rnd(-120,120), c.y + rnd(-150,120), rnd(-70,70), rnd(-90,30), 420);
+    }
+    if(Math.random() < 0.4) particle('flash', c.x + rnd(-80,80), c.y + rnd(-100,80), 0, 0, 260, rnd(60,120));
+  }, 70);
+  setTimeout(() => {
+    clearInterval(chIv);
+    if(over){ fe.classList.remove('tremble'); return; }
+    fe.src = E.d.lsModel;
+    fe.classList.remove('tremble');
+    fe.classList.add('tremble');
+    restart($('#arena'), 'quake');
+    const DUR = 8000, end = Date.now() + DUR;
+    const offs = [-30, 30];
+    const src = () => { const r = fe.getBoundingClientRect(); return { x:r.left + r.width * 0.3, y:r.top + r.height * 0.3 }; };
+    const s0 = src(), t0 = center(fp);
+    const beams = offs.map(o => {
+      const d = document.createElement('div'); d.className = 'ghBeam';
+      setBeam(d, s0.x, s0.y + o, t0.x, t0.y + o * 0.6);
+      document.body.appendChild(d);
+      d.animate([{ clipPath:'inset(0 100% 0 0)' }, { clipPath:'inset(0 0 0 0)' }], { duration:240, easing:'ease-out', fill:'forwards' });
+      return d;
+    });
+    fp.classList.add('tremble');
+    particle('flash', s0.x, s0.y, 0, 0, 320, 200);
+    let done = false;
+    function cleanup(){
+      if(done) return; done = true;
+      clearInterval(fxIv); clearInterval(dmgIv);
+      beams.forEach(b => b.remove());
+      fp.classList.remove('tremble');
+      fe.classList.remove('tremble');
+      if(!over) fe.src = E.d.model;
+    }
+    const fxIv = setInterval(() => {
+      if(over || Date.now() > end){ cleanup(); return; }
+      const a = src(), b = center(fp);
+      beams.forEach((d, i) => setBeam(d, a.x, a.y + offs[i], b.x, b.y + offs[i] * 0.6));
+      particle('bzSpark', b.x + rnd(-60,60), b.y + rnd(-70,60), rnd(-110,110), rnd(-110,40), 450 + rnd(0,250));
+      particle('spark', b.x + rnd(-60,60), b.y + rnd(-70,60), rnd(-90,90), rnd(-100,30), 400);
+      particle('dsmoke', b.x + rnd(-50,50), b.y + rnd(-50,50), rnd(-40,40), -rnd(40,90), 900 + rnd(0,400), rnd(70,130));
+      particle('puff', b.x + rnd(-50,50), b.y + rnd(-30,50), rnd(-40,40), -rnd(30,80), 700, rnd(50,100));
+      particle('spark', a.x + rnd(-20,20), a.y + rnd(-30,30), rnd(-60,60), rnd(-60,60), 350);
+      if(Math.random() < 0.3) particle('flash', b.x + rnd(-40,40), b.y + rnd(-50,50), 0, 0, 240, rnd(60,110));
+    }, 80);
+    const dmgIv = setInterval(() => {
+      if(over || Date.now() > end){ clearInterval(dmgIv); return; }
+      sfx.zap();
+      damagePlayer(350, '#fde047');
+    }, 300);
+    setTimeout(cleanup, DUR + 100);
+  }, 1100);
+}
+
+const _enemyAttackGH = enemyAttack;
+enemyAttack = function(){
+  if(over || !E || !E.d.gh) return _enemyAttackGH();
+  if(stunned()){ scheduleEnemy(E.stunUntil - Date.now() + 50); return; }
+  if(E.pauseUntil && Date.now() < E.pauseUntil){ scheduleEnemy(E.pauseUntil - Date.now() + 50); return; }
+  E.ghN = (E.ghN || 0) + 1;
+  if(E.ghN % 2 === 0) return ghLasers();
+  const r = _enemyAttackGH();
+  const pend = E.pending;
+  restart($('#fE'), 'jit');
+  setTimeout(() => {
+    if(over || !pend || pend.cancelled) return;
+    restart($('#arena'), 'quake');
+    shockRing(center($('#fP')), 'rgba(255,255,255,.9)');
+    dustBig(center($('#fP')), 10);
+  }, 620);
+  return r;
+};
+
+const _startFightGH = startFight;
+startFight = function(){
+  if(!sel.char || !sel.enemy) return;
+  const isGH = !!A.enemies[sel.enemy].gh;
+  loadSnd('ghLaser', GH_LASER);
+  pvpAudio.src = isGH ? GH_THEME : A.pvp;
+  pvpAudio.loop = true;
+  _startFightGH();
+  const ew = $('#eWrap'), fe = $('#fE');
+  ew.style.width = isGH ? 'min(64vw,560px)' : '';
+  fe.style.maxHeight = isGH ? '72vh' : '';
+};/* ===== АНТИЛАГ: лимит частиц, лёгкие лучи, меньше фонового мусора ===== */
+const lagStyle = document.createElement('style');
+lagStyle.textContent = `
+.zbeam{filter:none!important;box-shadow:0 0 18px #a855f7}
+.ray,.zray{box-shadow:0 0 4px #fff}
+.ghB{position:fixed;left:0;top:0;height:0;transform-origin:0 50%;z-index:171;pointer-events:none;animation:ghFlick .07s linear infinite alternate}
+@keyframes ghFlick{from{opacity:.82}to{opacity:1}}
+.ghB i{position:absolute;left:0;width:100%;display:block;border-radius:50px}
+.ghBo{top:-52px;height:104px;background:linear-gradient(180deg,rgba(245,158,11,0),rgba(245,158,11,.38) 35%,rgba(251,146,60,.55) 50%,rgba(245,158,11,.38) 65%,rgba(245,158,11,0))}
+.ghBm{top:-28px;height:56px;background:repeating-linear-gradient(90deg,rgba(250,204,21,.95) 0 40px,rgba(254,240,138,1) 40px 70px);background-size:140px 100%;animation:ghFlow .25s linear infinite;box-shadow:0 0 24px #facc15}
+.ghBc{top:-11px;height:22px;background:linear-gradient(180deg,rgba(255,255,255,.6),#fff 50%,rgba(255,255,255,.6));box-shadow:0 0 14px #fffbe0}
+@keyframes ghFlow{from{background-position:0 0}to{background-position:140px 0}}
+.ghFlare{position:fixed;left:0;top:0;width:160px;height:160px;margin:-80px 0 0 -80px;border-radius:50%;background:radial-gradient(circle,#fff,#fde047 30%,rgba(245,158,11,.6) 55%,rgba(245,158,11,0) 72%);z-index:173;pointer-events:none;animation:ghFlick .07s linear infinite alternate}
+.ghScorch{position:fixed;left:0;top:0;width:200px;height:70px;margin:-35px 0 0 -100px;border-radius:50%;background:radial-gradient(ellipse,rgba(255,200,60,.75),rgba(234,88,12,.45) 40%,rgba(0,0,0,0) 72%);z-index:169;pointer-events:none;animation:ghFlick .1s linear infinite alternate}
+`;
+document.head.appendChild(lagStyle);
+
+let _pc = 0;
+const _particleBase = particle;
+particle = function(cls, x, y, dx, dy, dur, size){
+  const isFlash = cls.indexOf('flash') >= 0;
+  if(!isFlash && _pc > 55) return;
+  if(size && !isFlash && size > 110) size = 110;
+  _pc++;
+  setTimeout(() => { _pc--; }, (dur || 500) + 60);
+  return _particleBase(cls, x, y, dx, dy, dur, size);
+};
+ambient = function(){
+  if(over || Math.random() < 0.65) return;
+  particle('mote', rnd(0, innerWidth), rnd(innerHeight * 0.25, innerHeight), rnd(-30,30), rnd(-90,-30), 2400, 4);
+};
+
+function makeGhBeam(){
+  const d = document.createElement('div'); d.className = 'ghB';
+  d.innerHTML = '<i class="ghBo"></i><i class="ghBm"></i><i class="ghBc"></i>';
+  document.body.appendChild(d);
+  return d;
+}
+
+/* ===== G-Hare 1.0: Lasers V2 (улучшенные) ===== */
+ghLasers = function(){
+  if(over) return;
+  const fe = $('#fE'), fp = $('#fP');
+  scheduleEnemy(E.d.headCd);
+  playSnd('ghLaser', GH_LASER, 1.5);
+  fe.classList.add('tremble');
+  const chIv = setInterval(() => {
+    if(over){ clearInterval(chIv); fe.classList.remove('tremble'); return; }
+    const c = center(fe);
+    for(let i = 0; i < 2; i++){
+      const a = Math.random() * Math.PI * 2, r = rnd(110, 190);
+      particle('bzSpark', c.x + Math.cos(a) * r, c.y + Math.sin(a) * r, -Math.cos(a) * r * 0.8, -Math.sin(a) * r * 0.8, 520);
+    }
+    particle('spark', c.x + rnd(-120,120), c.y + rnd(-150,100), rnd(-70,70), rnd(-90,30), 420);
+    if(Math.random() < 0.4) particle('flash', c.x + rnd(-80,80), c.y + rnd(-100,80), 0, 0, 260, rnd(60,120));
+  }, 90);
+  setTimeout(() => {
+    clearInterval(chIv);
+    if(over){ fe.classList.remove('tremble'); return; }
+    fe.src = E.d.lsModel;
+    restart($('#arena'), 'quake');
+    softShake(8000);
+    const DUR = 8000, end = Date.now() + DUR;
+    const offs = [-34, 34];
+    const src = () => { const r = fe.getBoundingClientRect(); return { x:r.left + r.width * 0.3, y:r.top + r.height * 0.3 }; };
+    const s0 = src(), t0 = center(fp);
+    const beams = offs.map(o => {
+      const d = makeGhBeam();
+      setBeam(d, s0.x, s0.y + o, t0.x, t0.y + o * 0.6);
+      d.animate([{ clipPath:'inset(-60px 100% -60px 0)' }, { clipPath:'inset(-60px 0 -60px 0)' }], { duration:260, easing:'ease-out', fill:'forwards' });
+      return d;
+    });
+    const flares = [document.createElement('div'), document.createElement('div')];
+    flares.forEach(f => { f.className = 'ghFlare'; document.body.appendChild(f); });
+    const scorch = document.createElement('div'); scorch.className = 'ghScorch'; document.body.appendChild(scorch);
+    fp.classList.add('tremble');
+    particle('flash', s0.x, s0.y, 0, 0, 320, 220);
+    shockRing(s0, 'rgba(250,204,21,.95)');
+    let done = false, tick = 0;
+    function cleanup(){
+      if(done) return; done = true;
+      clearInterval(fxIv); clearInterval(dmgIv);
+      beams.forEach(b => b.remove());
+      flares.forEach(f => f.remove());
+      scorch.remove();
+      fp.classList.remove('tremble');
+      fe.classList.remove('tremble');
+      if(!over) fe.src = E.d.model;
+    }
+    const fxIv = setInterval(() => {
+      if(over || Date.now() > end){ cleanup(); return; }
+      tick++;
+      const a = src(), b = center(fp);
+      beams.forEach((d, i) => setBeam(d, a.x, a.y + offs[i], b.x, b.y + offs[i] * 0.6));
+      flares.forEach((f, i) => { f.style.left = a.x + 'px'; f.style.top = (a.y + offs[i]) + 'px'; });
+      scorch.style.left = b.x + 'px'; scorch.style.top = (b.y + 90) + 'px';
+      /* у источника */
+      particle('spark', a.x + rnd(-20,20), a.y + rnd(-40,40), rnd(-70,40), rnd(-70,70), 380);
+      particle('bzSpark', a.x + rnd(-20,20), a.y + rnd(-40,40), rnd(-90,60), rnd(-90,60), 420);
+      /* на цели: огонь, дым, пыль, искры */
+      particle('fire', b.x + rnd(-70,70), b.y + rnd(0,80), rnd(-30,30), -rnd(80,170), 650 + rnd(0,300), rnd(26,50));
+      particle('bzFire', b.x + rnd(-60,60), b.y + rnd(10,80), rnd(-40,40), -rnd(60,140), 600 + rnd(0,300), rnd(16,30));
+      particle('bzSlEmber', b.x + rnd(-50,50), b.y + rnd(-60,60), rnd(-130,130), rnd(-140,40), 500 + rnd(0,300));
+      particle('bzSpark', b.x + rnd(-50,50), b.y + rnd(-60,60), rnd(-110,110), rnd(-120,40), 450 + rnd(0,250));
+      particle('dsmoke', b.x + rnd(-60,60), b.y + rnd(-50,50), rnd(-50,50), -rnd(50,110), 1000 + rnd(0,400), rnd(80,110));
+      particle('puff', b.x + rnd(-70,70), b.y + rnd(20,90), rnd(-90,90), -rnd(10,50), 800 + rnd(0,300), rnd(70,110));
+      if(tick % 3 === 0){ shockRing(b, 'rgba(251,146,60,.9)'); particle('flash', b.x + rnd(-30,30), b.y + rnd(-40,40), 0, 0, 240, rnd(80,130)); }
+      if(tick % 4 === 0){ dustBig(b, 2); restart(fp, 'shake'); }
+      /* лучи искр вдоль лучей */
+      const t = Math.random();
+      particle('bzSpark', a.x + (b.x - a.x) * t + rnd(-15,15), a.y + (b.y - a.y) * t + rnd(-25,25), rnd(-50,50), rnd(-70,10), 400);
+    }, 110);
+    const dmgIv = setInterval(() => {
+      if(over || Date.now() > end){ clearInterval(dmgIv); return; }
+      sfx.zap();
+      damagePlayer(350, '#fde047');
+    }, 300);
+    setTimeout(cleanup, DUR + 100);
+  }, 1100);
+};
+
+/* ===== Позиция и размер G-Hare 1.0 ===== */
+const _startFightGH2 = startFight;
+startFight = function(){
+  const r = _startFightGH2.apply(this, arguments);
+  if(!sel.char || !sel.enemy) return r;
+  const isGH = !!A.enemies[sel.enemy].gh;
+  const ew = $('#eWrap'), fe = $('#fE');
+  ew.style.right = isGH ? '-9vw' : '';
+  ew.style.bottom = isGH ? '10%' : '';
+  ew.style.width = isGH ? 'min(72vw,640px)' : '';
+  fe.style.maxHeight = isGH ? '78vh' : '';
+  return r;
+};const TS_KEY = 'TitanSpeakerHare 1.0';
+const TS_SCREAM = 'https://www.dropbox.com/scl/fi/clky1xyk9jyn0c2ht7oni/lv_0_20261106200912.mp3?rlkey=8jlw47n330t8a1i8h1rhtxd6a&st=sibu0bnu&dl=1';
+const TS_SLAP = 'https://www.dropbox.com/scl/fi/hgelmsiu7kd0f9oyma4h1/lv_0_20261106201146.mp3?rlkey=z7l7h989oy6dpx013n84n9z5v&st=28rje5z0&dl=1';
+const TS_SHOOT = 'https://www.dropbox.com/scl/fi/19tfaqdxzq9cdrtxlqktp/lv_0_20261106200956.mp3?rlkey=opusckgiuo5e5vwoxvop9h6rv&st=88d8kq6i&dl=1';
+const TS_EXPL = 'https://www.dropbox.com/scl/fi/razhraclljejk1eqneu18/lv_0_20261106201036.mp3?rlkey=ngln19s38jlz0feklsndhbp4b&st=vfyc0ine&dl=1';
+const TS_RAGE = 'https://www.dropbox.com/scl/fi/gsvaxh6ybq3ojx5p3vx2r/lv_0_20261106201633.mp3?rlkey=mjh14apdhnj2dpkfs2oany1e7&st=213ft1sn&dl=1';
+const TS_THEME = 'https://www.dropbox.com/scl/fi/3hvc7gqtibl7k4qvopta3/THEME-TitanSpeakerHare-1.0.mp3?rlkey=0mpt6kmbyumn3h05q9uxkh7by&st=6n4rm14e&dl=1';
+const TS_ICON = 'https://www.dropbox.com/scl/fi/dfonh35lhydjkjbgu40kg/Picsart_26-11-06_20-22-05-787.jpg?rlkey=19yefez9z3cjqeipk09iqr0yc&st=cdzamodc&dl=1';
+const TS_MODEL = 'https://www.dropbox.com/scl/fi/z6pbh6dojvb1t0wqqgvns/IMG_20261106_200149_506.png?rlkey=bqnt7m3mnx5v4tbhx2d38x2rm&st=86raj2f5&dl=1';
+
+A.chars[TS_KEY] = {
+  icon: TS_ICON,
+  model: TS_MODEL,
+  info: 'Громкий пацан, только не внимательный.',
+  abil: 'Scream-Wave, Barrage, Shoot, Slap, Rage-Dash',
+  hp: 10000, stars: '☆☆☆☆☆', cd: 20000,
+  abl: ['Scream-Wave', 'Barrage', 'Shoot', 'Slap', 'Rage-Dash'],
+  pun: [25, 45], titan: true
+};
+
+const tsTheme = new Audio(TS_THEME);
+tsTheme.loop = true;
+tsTheme.volume = 0.6;
+tsTheme.preload = 'auto';
+
+[TS_SCREAM, TS_SLAP, TS_SHOOT, TS_EXPL, TS_RAGE].forEach(preSnd);
+(new Image()).src = TS_MODEL;
+
+const tsStyle = document.createElement('style');
+tsStyle.textContent = `
+@keyframes screamShake{
+0%{transform:translate(0,0);filter:blur(0)}
+8%{transform:translate(-16px,9px);filter:blur(3px)}
+18%{transform:translate(15px,-10px);filter:blur(4px)}
+30%{transform:translate(-13px,8px);filter:blur(3px)}
+42%{transform:translate(11px,-6px);filter:blur(3px)}
+56%{transform:translate(-8px,5px);filter:blur(2px)}
+72%{transform:translate(5px,-3px);filter:blur(1px)}
+100%{transform:translate(0,0);filter:blur(0)}}
+#arena.scream{animation:screamShake 1s linear}
+.tsBlurWave{position:fixed;left:0;top:0;width:200px;height:200px;margin:-100px 0 0 -100px;border-radius:50%;border:14px solid rgba(255,255,255,.65);border-left-color:transparent;border-bottom-color:transparent;filter:blur(4px);z-index:172;pointer-events:none}
+.tsBullet{position:fixed;left:0;top:0;width:110px;height:36px;margin:-18px 0 0 -55px;background:linear-gradient(90deg,#450a0a,#b91c1c 30%,#ef4444 65%,#fff);clip-path:polygon(0 8%,55% 0,100% 50%,55% 100%,0 92%);filter:drop-shadow(0 0 10px #ef4444);z-index:175;pointer-events:none}
+.tsRedWave{position:fixed;left:0;top:0;width:90px;height:90px;border-radius:50%;border:2px solid rgba(255,110,110,.5);background:radial-gradient(circle,rgba(239,68,68,0) 45%,rgba(239,68,68,.38) 62%,rgba(239,68,68,0) 74%);z-index:167;pointer-events:none}
+`;
+document.head.appendChild(tsStyle);
+
+function redFlash(){
+  const d = document.createElement('div');
+  d.style.cssText = 'position:fixed;inset:0;background:rgba(255,0,0,.38);z-index:176;pointer-events:none';
+  document.body.appendChild(d);
+  setTimeout(() => d.remove(), 200);
+}
+function fpFront(){
+  const r = $('#fP').getBoundingClientRect();
+  return { x: r.left + r.width * 0.78, y: r.top + r.height * 0.4 };
+}
+
+/* ===== Scream-Wave ===== */
+function screamWave(){
+  playSnd('tsScream', TS_SCREAM, 1.5);
+  const fp = $('#fP'), ar = $('#arena');
+  restart(fp, 'jit');
+  ar.classList.remove('scream'); void ar.offsetWidth; ar.classList.add('scream');
+  setTimeout(() => ar.classList.remove('scream'), 1050);
+  const a = fpFront();
+  particle('flash', a.x, a.y, 0, 0, 300, 160);
+  shockRing(a, 'rgba(255,255,255,.9)');
+  dustBig(a, 4);
+  for(let k = 0; k < 4; k++){
+    setTimeout(() => {
+      if(over) return;
+      const s = fpFront(), b = center($('#fE'));
+      const w = document.createElement('div'); w.className = 'tsBlurWave';
+      document.body.appendChild(w);
+      w.animate([
+        { transform:`translate(${s.x}px,${s.y}px) scale(.4) rotate(45deg)`, opacity:.95 },
+        { transform:`translate(${b.x}px,${b.y}px) scale(2) rotate(45deg)`, opacity:.15 }
+      ], { duration:620, easing:'ease-in', fill:'forwards' });
+      setTimeout(() => w.remove(), 660);
+      particle('puff', s.x, s.y, rnd(40,120), rnd(-30,30), 700, rnd(70,110));
+    }, 120 + k * 130);
+  }
+  setTimeout(() => {
+    if(over) return;
+    const c = center($('#fE'));
+    restart($('#arena'), 'quake');
+    shockRing(c, 'rgba(255,255,255,.9)');
+    particle('flash', c.x, c.y, 0, 0, 300, 200);
+    impactFx($('#fE'), 'dust');
+    dustBig(c, 5);
+    smokeAt($('#fE'), 220);
+    damageEnemy(rnd(1890, 2250));
+  }, 760);
+}
+
+/* ===== Slap ===== */
+function slapTS(){
+  const fp = $('#fP');
+  restart(fp, 'jit');
+  setTimeout(() => {
+    if(over) return;
+    const a = center(fp), b = center($('#fE'));
+    const dx = (b.x - a.x) * 0.5;
+    fp.animate([
+      { transform:'translate(0,0) rotate(0deg)' },
+      { transform:`translate(${dx}px,-10px) rotate(8deg)`, offset:.4 },
+      { transform:'translate(0,0) rotate(0deg)' }
+    ], { duration:520, easing:'ease-out' });
+    setTimeout(() => {
+      if(over) return;
+      playSnd('tsSlap', TS_SLAP, 1.5);
+      const c = center($('#fE'));
+      restart($('#arena'), 'quake');
+      restart($('#fE'), 'hurt');
+      particle('flash', c.x, c.y, 0, 0, 300, 200);
+      shockRing(c, 'rgba(255,255,255,.95)');
+      setTimeout(() => shockRing(c, 'rgba(251,146,60,.8)'), 100);
+      impactFx($('#fE'), 'spark');
+      dustBig(c, 6);
+      smokeAt($('#fE'), 230);
+      for(let i = 0; i < 6; i++){
+        arcFly('stone', { x:c.x + rnd(-30,30), y:c.y + rnd(-30,30) }, { x:c.x + rnd(-220,220), y:c.y + rnd(60,160) }, 600 + rnd(0,200), rnd(70,150), null);
+      }
+      for(let i = 0; i < 8; i++) particle('shard', c.x + rnd(-30,30), c.y + rnd(-30,30), rnd(-140,140), rnd(-120,50), 600 + rnd(0,300));
+      damageEnemy(rnd(1740, 1950));
+    }, 210);
+  }, 260);
+}
+
+/* ===== Shoot / Barrage ===== */
+function tsExplode(c, dmg){
+  playSnd('tsExpl', TS_EXPL, 1.5);
+  restart($('#arena'), 'quake');
+  restart($('#fE'), 'hurt');
+  particle('flash', c.x, c.y, 0, 0, 420, 260);
+  shockRing(c, 'rgba(239,68,68,.95)');
+  setTimeout(() => shockRing(c, 'rgba(251,146,60,.85)'), 100);
+  setTimeout(() => shockRing(c, 'rgba(0,0,0,.6)'), 200);
+  for(let i = 0; i < 9; i++) particle('fire', c.x + rnd(-40,40), c.y + rnd(-40,40), rnd(-120,120), rnd(-130,30), 650 + rnd(0,300), rnd(30,56));
+  for(let i = 0; i < 7; i++) particle('dsmoke', c.x + rnd(-60,60), c.y + rnd(-50,50), rnd(-70,70), -rnd(40,110), 1200 + rnd(0,600), rnd(90,110));
+  for(let i = 0; i < 8; i++) particle(i % 2 ? 'bzSpark' : 'bzSlEmber', c.x + rnd(-30,30), c.y + rnd(-30,30), rnd(-150,150), rnd(-150,50), 550 + rnd(0,300));
+  dustBig(c, 4);
+  smokeAt($('#fE'), 240);
+  setTimeout(() => {
+    if(over) return;
+    for(let i = 0; i < 3; i++) particle('dsmoke', c.x + rnd(-60,60), c.y + rnd(-40,40), rnd(-40,40), -rnd(60,120), 1400, rnd(90,110));
+  }, 350);
+  damageEnemy(dmg);
+}
+function tsBulletFly(a, b, dur, dmg){
+  const el = document.createElement('div'); el.className = 'tsBullet';
+  document.body.appendChild(el);
+  const kf = [];
+  for(let i = 0; i <= 12; i++){
+    const t = i / 12, p = bez(a, b, 40, t), q = bez(a, b, 40, Math.min(1, t + 0.02));
+    const ang = Math.atan2(q.y - p.y, q.x - p.x) * 180 / Math.PI;
+    kf.push({ transform:`translate(${p.x}px,${p.y}px) rotate(${ang}deg)`, offset:t });
+  }
+  const t0 = performance.now();
+  let k = 0;
+  const iv = setInterval(() => {
+    const t = Math.min(1, (performance.now() - t0) / dur), p = bez(a, b, 40, t);
+    particle('tsRedWave', p.x, p.y, rnd(-12,12), rnd(-12,12), 420, rnd(70,100));
+    particle('fire', p.x, p.y, rnd(-20,20), rnd(-20,20), 480, rnd(24,40));
+    if(k++ % 2 === 0) particle('dsmoke', p.x, p.y, rnd(-20,20), rnd(-30,10), 900, rnd(70,100));
+    if(t >= 1) clearInterval(iv);
+  }, 50);
+  el.animate(kf, { duration:dur, easing:'linear', fill:'forwards' }).onfinish = () => {
+    el.remove(); clearInterval(iv);
+    if(over) return;
+    tsExplode(center($('#fE')), dmg);
+  };
+}
+function tsShot(dmg, withFlash){
+  const fp = $('#fP');
+  playSnd('tsShoot', TS_SHOOT, 1.5);
+  restart(fp, 'jit');
+  if(withFlash) redFlash();
+  const a = fpFront();
+  particle('flash', a.x, a.y, 0, 0, 260, 150);
+  shockRing(a, 'rgba(239,68,68,.95)');
+  for(let i = 0; i < 5; i++) particle('fire', a.x + rnd(-15,15), a.y + rnd(-15,15), rnd(10,100), rnd(-50,50), 500, rnd(22,40));
+  particle('dsmoke', a.x, a.y, rnd(20,60), -rnd(20,60), 900, 100);
+  tsBulletFly(a, center($('#fE')), 520, dmg);
+}
+function shootTS(){
+  tsShot(rnd(1567, 1981), true);
+}
+function barrageTS(){
+  playSnd('tsRage', TS_RAGE, 1.5);
+  const fp = $('#fP');
+  restart(fp, 'shake');
+  setAura($('#aura'), 'red');
+  const c = center(fp);
+  shockRing(c, 'rgba(255,23,68,.95)');
+  particle('flash', c.x, c.y, 0, 0, 300, 180);
+  let n = 0;
+  const fire = () => {
+    if(over) return;
+    n++;
+    tsShot(600, false);
+  };
+  fire();
+  const iv = setInterval(() => {
+    if(over || n >= 4){ clearInterval(iv); return; }
+    fire();
+  }, 800);
+  setTimeout(() => { if(!over) setAura($('#aura'), null); }, 3400);
+}
+
+/* ===== Rage-Dash ===== */
+function jetFx(){
+  const r = $('#fP').getBoundingClientRect();
+  const x = r.left + r.width * 0.15, y = r.top + r.height * 0.55;
+  particle('fire', x + rnd(-10,10), y + rnd(-15,15), -rnd(40,110), rnd(-30,30), 520, rnd(30,52));
+  particle('bzFire', x + rnd(-10,10), y + rnd(-15,15), -rnd(30,90), rnd(-20,30), 480, rnd(18,30));
+  particle('dsmoke', x + rnd(-10,10), y + rnd(-15,15), -rnd(40,120), rnd(-40,20), 1000, rnd(80,110));
+  particle('bzSpark', x, y, -rnd(50,130), rnd(-60,60), 420);
+}
+function rageDash(){
+  const fp = $('#fP'), fe = $('#fE');
+  P.dashReadyAt = Infinity;
+  sfx.boost();
+  restart(fp, 'jit');
+  const c0 = center(fp);
+  shockRing(c0, 'rgba(255,100,40,.9)');
+  particle('flash', c0.x, c0.y, 0, 0, 280, 150);
+  const chIv = setInterval(jetFx, 50);
+  setTimeout(() => {
+    clearInterval(chIv);
+    if(over) return;
+    const fr = fp.getBoundingClientRect(), er = fe.getBoundingClientRect();
+    const a = center(fp), b = center(fe);
+    const dx = Math.max(60, er.left + er.width * 0.12 - (fr.left + fr.width * 0.9));
+    const dy = (b.y - a.y) * 0.7;
+    const an = fp.animate([
+      { transform:'translate(0,0) rotate(0deg)' },
+      { transform:`translate(${dx}px,${dy}px) rotate(12deg)` }
+    ], { duration:500, easing:'cubic-bezier(.6,0,.9,.5)', fill:'forwards' });
+    P.dashAnims.push(an);
+    const iv = setInterval(() => { if(over){ clearInterval(iv); return; } jetFx(); }, 45);
+    an.onfinish = () => {
+      clearInterval(iv);
+      if(over) return;
+      const c = center(fe);
+      sfx.crush(); sfx.hit();
+      restart($('#arena'), 'quake');
+      restart(fe, 'hurt');
+      particle('flash', c.x, c.y, 0, 0, 360, 240);
+      shockRing(c, 'rgba(255,255,255,.95)');
+      setTimeout(() => shockRing(c, 'rgba(251,146,60,.85)'), 100);
+      impactFx(fe, 'spark');
+      dustBig(c, 6);
+      smokeAt(fe, 230);
+      for(let i = 0; i < 8; i++) particle('shard', c.x + rnd(-30,30), c.y + rnd(-30,30), rnd(-140,140), rnd(-120,50), 600 + rnd(0,300));
+      floatText(fe, 'STUN', '#fde047');
+      damageEnemy(1000);
+      const STUN = 20000, end = Date.now() + STUN;
+      E.stunUntil = end;
+      if(E.pending && !E.pending.landed) E.pending.cancelled = true;
+      fe.classList.add('tremble');
+      const sIv = setInterval(() => {
+        if(over || Date.now() > end){ clearInterval(sIv); fe.classList.remove('tremble'); return; }
+        const e = center(fe);
+        particle('spark', e.x + rnd(-60,60), e.y + rnd(-70,60), rnd(-60,60), rnd(-80,20), 420);
+        if(Math.random() < 0.4) particle('dsmoke', e.x + rnd(-50,50), e.y + rnd(-40,50), rnd(-30,30), -rnd(40,90), 1000, rnd(70,100));
+      }, 350);
+      setTimeout(() => {
+        if(over) return;
+        const an2 = fp.animate([
+          { transform:`translate(${dx}px,${dy}px) rotate(12deg)` },
+          { transform:'translate(0,0) rotate(0deg)' }
+        ], { duration:650, easing:'ease-in-out', fill:'forwards' });
+        P.dashAnims.push(an2);
+        const iv2 = setInterval(() => { if(over){ clearInterval(iv2); return; } jetFx(); }, 50);
+        an2.onfinish = () => {
+          clearInterval(iv2);
+          try{ an.cancel(); an2.cancel(); }catch(e){}
+          P.dashReadyAt = Date.now() + 30000;
+        };
+      }, 380);
+    };
+  }, 380);
+}
+
+/* ===== Блокировки ===== */
+const _updateLockTS = updateLock;
+updateLock = function(){
+  _updateLockTS();
+  if(!P || P.d !== A.chars[TS_KEY]) return;
+  const ab = $('#abil');
+  const bb = ab.querySelector('[data-ab="Barrage"]');
+  if(bb){
+    const lk = !!P.barrageLocked;
+    bb.classList.toggle('locked', lk);
+    bb.textContent = lk ? 'Barrage\nНужен Shoot' : 'Barrage';
+  }
+  const rd = ab.querySelector('[data-ab="Rage-Dash"]');
+  if(rd){
+    const left = (P.dashReadyAt || 0) - Date.now();
+    const lk = left > 0;
+    rd.classList.toggle('locked', lk);
+    rd.textContent = lk ? ('Rage-Dash\n' + (isFinite(left) ? Math.ceil(left / 1000) + ' c' : '...')) : 'Rage-Dash';
+  }
+};
+
+const _useAbilityTS = useAbility;
+useAbility = function(name){
+  if(P && P.d === A.chars[TS_KEY]){
+    const map = { 'Scream-Wave':screamWave, 'Barrage':barrageTS, 'Shoot':shootTS, 'Slap':slapTS, 'Rage-Dash':rageDash };
+    if(map[name]){
+      if(!abilOpen || over) return;
+      if(name === 'Barrage' && P.barrageLocked){
+        floatText($('#fP'), 'Нужен Shoot', '#fca5a5');
+        return;
+      }
+      if(name === 'Rage-Dash' && Date.now() < (P.dashReadyAt || 0)){
+        floatText($('#fP'), 'Перезарядка', '#fca5a5');
+        return;
+      }
+      hideAbilities();
+      if(name === 'Shoot') P.barrageLocked = false;
+      if(name === 'Barrage') P.barrageLocked = true;
+      return map[name]();
+    }
+  }
+  return _useAbilityTS(name);
+};
+
+/* ===== Музыка, размер, очистка ===== */
+const _endFightTS = endFight;
+endFight = function(){
+  _endFightTS();
+  try{ tsTheme.pause(); tsTheme.currentTime = 0; }catch(e){}
+  if(P && P.dashAnims) P.dashAnims.forEach(a => { try{ a.cancel(); }catch(e){} });
+  $('#arena').classList.remove('scream');
+};
+
+const _startFightTS = startFight;
+startFight = function(){
+  if(!sel.char || !sel.enemy) return;
+  const isTS = sel.char === TS_KEY;
+  try{ tsTheme.pause(); tsTheme.currentTime = 0; }catch(e){}
+  if(isTS){
+    [['tsScream', TS_SCREAM], ['tsSlap', TS_SLAP], ['tsShoot', TS_SHOOT], ['tsExpl', TS_EXPL], ['tsRage', TS_RAGE]].forEach(s => { preSnd(s[1]); loadSnd(s[0], s[1]); });
+  }
+  const r = _startFightTS.apply(this, arguments);
+  if(!P) return r;
+  P.barrageLocked = true;
+  P.dashReadyAt = 0;
+  P.dashAnims = [];
+  $('#abil').classList.toggle('five', isTS || sel.char === 'LargeTvHare 2.0');
+  const pw = $('#pWrap'), fp = $('#fP');
+  if(isTS){
+    pw.style.width = 'min(54vw,460px)';
+    pw.style.left = '-3vw';
+    fp.style.maxHeight = '58vh';
+    tsTheme.volume = 0.6;
+    tsTheme.play().catch(() => {});
+  } else {
+    pw.style.left = '';
+    fp.style.maxHeight = '';
+  }
+  updateLock();
+  return r;
+};
+
+buildIcons($('#charIcons'), A.chars, key => {
+  sel.char = key;
+  renderCard($('#charCard'), key, A.chars[key], 'char', 'Начать', () => {
+    go('pvp', () => {
+      sel.enemy = null; $('#enemyCard').innerHTML = '';
+      $('#enemyIcons').querySelectorAll('.ico').forEach(i => i.classList.remove('sel'));
+    });
+  });
+});/* ===== Фикс музыки TitanSpeakerHare 1.0 + увеличение модели ===== */
+
+/* Причина: на телефоне play() иногда тихо отклоняется. Теперь трек "будится" жестом заранее и стартует с повторными попытками */
+let tsThemeWant = false;
+function tsThemeTry(){
+  if(!tsThemeWant || over) return;
+  if(!tsTheme.paused) return;
+  tsTheme.volume = 0.6;
+  tsTheme.play().catch(() => {});
+}
+function tsThemeUnlock(){
+  if(tsTheme._unlocked) return;
+  tsTheme._unlocked = true;
+  tsTheme.muted = true;
+  tsTheme.play().then(() => {
+    tsTheme.pause(); tsTheme.currentTime = 0; tsTheme.muted = false;
+    tsThemeTry();
+  }).catch(() => { tsTheme.muted = false; tsTheme._unlocked = false; });
+}
+document.addEventListener('pointerdown', () => {
+  tsThemeUnlock();
+  tsThemeTry();
+});
+tsTheme.load();
+
+const _endFightTS2 = endFight;
+endFight = function(){
+  tsThemeWant = false;
+  return _endFightTS2.apply(this, arguments);
+};
+
+const _startFightTS2 = startFight;
+startFight = function(){
+  if(!sel.char || !sel.enemy) return;
+  const isTS = sel.char === TS_KEY;
+  tsThemeWant = false;
+  const r = _startFightTS2.apply(this, arguments);
+  if(!P) return r;
+  const pw = $('#pWrap'), fp = $('#fP'), ab = $('#abil');
+  if(isTS){
+    /* размер как у G-Hare 1.0 */
+    pw.style.width = 'min(72vw,640px)';
+    pw.style.left = '-6vw';
+    pw.style.bottom = '8%';
+    fp.style.maxHeight = '76vh';
+    ab.style.top = 'auto';
+    ab.style.bottom = '6px';
+    tsThemeWant = true;
+    tsTheme.currentTime = 0;
+    tsThemeTry();
+    [300, 900, 1800, 3000].forEach(ms => setTimeout(tsThemeTry, ms));
+  } else {
+    pw.style.bottom = '';
+    ab.style.top = '';
+    ab.style.bottom = '';
+  }
+  return r;
+};/* ===== МУЗЫКА TitanSpeakerHare 1.0: через Web Audio + сторож ===== */
+let tsWant = false, tsBuf = null, tsLoading = false, tsSrc = null, tsGain = null, tsAmbIv = null, tsGhosts = 0;
+
+/* отключаем старый <audio>, чтобы не было двойного звука и глушения */
+const _tsRealPlay = tsTheme.play.bind(tsTheme);
+let tsAllowEl = false;
+tsTheme.play = function(){ return tsAllowEl ? _tsRealPlay() : Promise.resolve(); };
+try{ tsTheme.pause(); }catch(e){}
+
+A.chars[TS_KEY].cd = 15000; /* атакует каждые 15 секунд */
+
+function tsStopWA(){
+  if(tsSrc){ try{ tsSrc.onended = null; tsSrc.stop(); }catch(e){} tsSrc = null; }
+  if(tsGain){ try{ tsGain.disconnect(); }catch(e){} tsGain = null; }
+  tsAllowEl = false;
+  try{ tsTheme.pause(); }catch(e){}
+}
+function tsPlayWA(){
+  if(!tsWant || over || !tsBuf) return;
+  if(tsSrc) return;
+  const c = ctx();
+  tsGain = c.createGain(); tsGain.gain.value = 0.7;
+  tsSrc = c.createBufferSource(); tsSrc.buffer = tsBuf; tsSrc.loop = true;
+  tsSrc.connect(tsGain).connect(c.destination);
+  tsSrc.onended = () => { tsSrc = null; };
+  tsSrc.start();
+}
+function tsPlayEl(){
+  if(!tsWant || over) return;
+  tsAllowEl = true;
+  tsTheme.loop = true; tsTheme.volume = 0.7;
+  _tsRealPlay().catch(() => {});
+}
+function tsLoadBuf(){
+  if(tsBuf || tsLoading) return;
+  tsLoading = true;
+  fetch(TS_THEME).then(r => r.arrayBuffer()).then(b => ctx().decodeAudioData(b)).then(buf => {
+    tsBuf = buf; tsLoading = false;
+    tsPlayWA();
+  }).catch(() => {
+    tsLoading = false;
+    tsPlayEl(); /* запасной вариант */
+  });
+}
+tsLoadBuf();
+
+/* сторож: музыка не должна пропадать, пока идёт бой */
+setInterval(() => {
+  if(!tsWant || over) return;
+  const c = ctx();
+  if(c.state !== 'running') c.resume().catch(() => {});
+  if(tsBuf && !tsSrc) tsPlayWA();
+}, 1000);
+document.addEventListener('pointerdown', () => {
+  if(tsWant){ const c = ctx(); if(c.state !== 'running') c.resume().catch(() => {}); tsLoadBuf(); tsPlayWA(); }
+});
+
+/* ===== Новые эффекты ===== */
+const ts2Style = document.createElement('style');
+ts2Style.textContent = `
+.tsAura{position:absolute;left:-22%;right:-22%;top:-10%;bottom:-6%;border-radius:50%;background:radial-gradient(circle,rgba(239,68,68,0) 30%,rgba(185,28,28,.42) 55%,rgba(0,0,0,.5) 68%,rgba(0,0,0,0) 76%);pointer-events:none;z-index:0;animation:tsAuraP 1.8s ease-in-out infinite}
+@keyframes tsAuraP{0%,100%{scale:.95;opacity:.55}50%{scale:1.08;opacity:1}}
+.tsGhost{position:fixed;pointer-events:none;z-index:3;object-fit:contain;filter:sepia(1) saturate(6) hue-rotate(-35deg) brightness(.95)}
+.tsEdge{position:fixed;inset:0;pointer-events:none;z-index:174}
+`;
+document.head.appendChild(ts2Style);
+
+function edgePulse(color, ms){
+  const d = document.createElement('div'); d.className = 'tsEdge';
+  d.style.boxShadow = 'inset 0 0 130px 30px ' + color;
+  document.body.appendChild(d);
+  d.animate([{ opacity:0 }, { opacity:1, offset:.25 }, { opacity:0 }], { duration:ms || 700, fill:'forwards' });
+  setTimeout(() => d.remove(), (ms || 700) + 50);
+}
+function tsGhost(){
+  if(tsGhosts > 7) return;
+  const fp = $('#fP'), r = fp.getBoundingClientRect();
+  const g = document.createElement('img'); g.className = 'tsGhost'; g.src = TS_MODEL;
+  g.style.left = r.left + 'px'; g.style.top = r.top + 'px'; g.style.width = r.width + 'px'; g.style.height = r.height + 'px';
+  document.body.appendChild(g); tsGhosts++;
+  g.animate([{ opacity:.5, transform:'scale(1)' }, { opacity:0, transform:'scale(1.06)' }], { duration:420, fill:'forwards' });
+  setTimeout(() => { g.remove(); tsGhosts--; }, 450);
+}
+
+/* Rage-Dash: призрачные силуэты за спиной */
+const _jetFxTS = jetFx;
+jetFx = function(){
+  _jetFxTS();
+  if(Math.random() < 0.6) tsGhost();
+};
+
+/* Scream-Wave: кольца звука по всей арене и красная пульсация по краям */
+const _screamTS = screamWave;
+screamWave = function(){
+  _screamTS();
+  edgePulse('rgba(255,255,255,.45)', 900);
+  for(let k = 0; k < 6; k++){
+    setTimeout(() => {
+      if(over) return;
+      const s = fpFront();
+      shockRing(s, k % 2 ? 'rgba(239,68,68,.85)' : 'rgba(255,255,255,.85)');
+      if(k % 2 === 0) particle('rspark', s.x + rnd(-30,30), s.y + rnd(-40,40), rnd(60,200), rnd(-80,80), 500);
+    }, k * 110);
+  }
+  floatText($('#fP'), 'AAAAAA!', '#ffffff');
+};
+
+/* Slap: радиальные красные линии удара и красная вспышка по краям */
+const _slapTS = slapTS;
+slapTS = function(){
+  _slapTS();
+  setTimeout(() => {
+    if(over) return;
+    const c = center($('#fE'));
+    edgePulse('rgba(251,146,60,.4)', 600);
+    for(let i = 0; i < 8; i++){
+      const a = i / 8 * Math.PI * 2, L = rnd(110, 200);
+      ray(c.x, c.y, c.x + Math.cos(a) * L, c.y + Math.sin(a) * L, 300, 'ray');
+    }
+    for(let i = 0; i < 6; i++) particle('bzSlEmber', c.x + rnd(-30,30), c.y + rnd(-30,30), rnd(-160,160), rnd(-150,40), 700);
+  }, 470);
+};
+
+/* Взрыв пули: огненный столб, двойная ударная волна, падающие угли */
+const _tsExplodeFx = tsExplode;
+tsExplode = function(c, dmg){
+  _tsExplodeFx(c, dmg);
+  edgePulse('rgba(239,68,68,.4)', 700);
+  for(let i = 0; i < 5; i++){
+    setTimeout(() => {
+      if(over) return;
+      particle('fire', c.x + rnd(-30,30), c.y + rnd(0,40) - i * 14, rnd(-15,15), -rnd(120,220), 800, rnd(30,50));
+    }, i * 70);
+  }
+  setTimeout(() => shockRing(c, 'rgba(255,255,255,.5)'), 300);
+  for(let i = 0; i < 6; i++) particle('bzSlEmber', c.x + rnd(-40,40), c.y - rnd(40,100), rnd(-80,80), rnd(60,150), 1100);
+};
+
+/* Живая аура и тлеющие угли вокруг Титана на весь бой */
+function tsAmbientStart(){
+  tsAmbientStop();
+  const aura = document.createElement('div'); aura.className = 'tsAura'; aura.id = 'tsAura';
+  $('#pWrap').insertBefore(aura, $('#pWrap').firstChild);
+  let t = 0;
+  tsAmbIv = setInterval(() => {
+    if(over) return;
+    t++;
+    const c = center($('#fP'));
+    particle('bzSlEmber', c.x + rnd(-90,90), c.y + rnd(0,100), rnd(-20,20), -rnd(90,170), 1300, 5);
+    if(t % 3 === 0) particle('dsmoke', c.x + rnd(-80,80), c.y + rnd(20,100), rnd(-20,20), -rnd(40,90), 1500, rnd(70,100));
+    if(t % 14 === 0) shockRing(c, 'rgba(239,68,68,.55)');
+  }, 160);
+}
+function tsAmbientStop(){
+  clearInterval(tsAmbIv); tsAmbIv = null;
+  const a = document.getElementById('tsAura'); if(a) a.remove();
+}
+
+const _endFightTS3 = endFight;
+endFight = function(){
+  tsWant = false;
+  tsStopWA();
+  tsAmbientStop();
+  return _endFightTS3.apply(this, arguments);
+};
+
+const _startFightTS3 = startFight;
+startFight = function(){
+  if(!sel.char || !sel.enemy) return;
+  const isTS = sel.char === TS_KEY;
+  tsWant = false; tsStopWA(); tsAmbientStop();
+  const r = _startFightTS3.apply(this, arguments);
+  if(!P) return r;
+  tsWant = false; tsStopWA(); /* глушим всё, что запустили старые обёртки */
+  if(isTS){
+    tsWant = true;
+    const c = ctx(); if(c.state !== 'running') c.resume().catch(() => {});
+    if(tsBuf) tsPlayWA(); else tsLoadBuf();
+    tsAmbientStart();
+  }
+  return r;
+};/* ===== TitanSpeakerHare 1.0: надёжная музыка ===== */
+/* отключаем все прошлые попытки */
+tsLoadBuf = function(){};
+tsPlayWA = function(){};
+tsPlayEl = function(){};
+tsWant = false;
+tsStopWA();
+
+let tsEl = null, tsOn = false;
+
+function tsMusicStop(){
+  tsOn = false;
+  if(tsEl){
+    try{ tsEl.pause(); tsEl.removeAttribute('src'); tsEl.load(); }catch(e){}
+    tsEl = null;
+  }
+}
+function tsMusicStart(){
+  tsMusicStop();
+  tsEl = new Audio(TS_THEME);
+  tsEl.loop = true;
+  tsEl.volume = 0.8;
+  tsEl.preload = 'auto';
+  tsOn = true;
+  /* если что-то поставило трек на паузу в бою, сразу запускаем снова */
+  tsEl.addEventListener('pause', () => {
+    if(tsOn && !over && tsEl) setTimeout(() => { if(tsOn && !over && tsEl && tsEl.paused) tsEl.play().catch(() => {}); }, 50);
+  });
+  tsEl.play().catch(() => {});
+}
+
+/* сторож: каждые 700 мс и при любом касании экрана */
+function tsMusicGuard(){
+  if(!tsOn || over || !tsEl) return;
+  if(tsEl.paused || tsEl.ended){
+    tsEl.volume = 0.8;
+    tsEl.play().catch(() => {});
+  }
+}
+setInterval(tsMusicGuard, 700);
+document.addEventListener('pointerdown', tsMusicGuard);
+
+const _endFightTS4 = endFight;
+endFight = function(){
+  tsMusicStop();
+  return _endFightTS4.apply(this, arguments);
+};
+
+const _startFightTS4 = startFight;
+startFight = function(){
+  if(!sel.char || !sel.enemy) return;
+  const isTS = sel.char === TS_KEY;
+  tsMusicStop();
+  /* запускаем сразу, пока идёт нажатие кнопки */
+  if(isTS) tsMusicStart();
+  const r = _startFightTS4.apply(this, arguments);
+  tsWant = false; tsStopWA();
+  /* старые обёртки могли остановить трек, проверяем ещё раз */
+  if(isTS){
+    if(!tsEl || !tsOn) tsMusicStart();
+    else tsMusicGuard();
+    [400, 1200, 2500].forEach(ms => setTimeout(tsMusicGuard, ms));
+  }
+  return r;
+};const IT_KEY = 'InfectedTitanSpeakerHare 1.0';
+const IT_THEME = 'https://www.dropbox.com/scl/fi/xf6iarbwlstegva436c7w/lv_0_20261106214821.mp3?rlkey=oblb5hy3lcjp658v1bea4ivzt&st=vxfks7kc&dl=1';
+
+A.enemies[IT_KEY] = {
+  icon:'https://www.dropbox.com/scl/fi/7s69jwn7atk4gqhu8e4yv/Picsart_26-11-06_21-38-35-893.jpg?rlkey=h96tfyy040e0l0l83xqzzvq2v&st=pz22nzp6&dl=1',
+  model:'https://www.dropbox.com/scl/fi/78om6qezpaq25uk14cl7q/IMG_20261106_213211_921.png?rlkey=t6k1asf6ofktbmzzsosrk824h&st=kqq1dv1n&dl=1',
+  info:'Страх альянса. А ведь надо было просто снять двух паразитов...',
+  abil:'Scream-Wave, Barrage, Shoot, Slap, Rage-Dash',
+  hp:10000, stars:'☆☆☆☆☆', head:[1,1], headCd:15000, it:true, titan:true
+};
+
+buildIcons($('#enemyIcons'), A.enemies, key => {
+  sel.enemy = key;
+  renderCard($('#enemyCard'), key, A.enemies[key], 'enemy', 'СТАРТ', startFight);
+});
+
+(new Image()).src = A.enemies[IT_KEY].model;
+
+const itStyle = document.createElement('style');
+itStyle.textContent = `
+.itBullet{filter:hue-rotate(95deg) saturate(1.4) drop-shadow(0 0 10px #84cc16)!important}
+.itToxic{position:fixed;left:0;top:0;border-radius:50%;background:radial-gradient(circle,rgba(163,230,53,.7),rgba(76,29,149,.35) 55%,rgba(0,0,0,0) 72%);z-index:166;pointer-events:none}
+`;
+document.head.appendChild(itStyle);
+
+function itSrc(){
+  const r = $('#fE').getBoundingClientRect();
+  return { x:r.left + r.width * 0.22, y:r.top + r.height * 0.4 };
+}
+function itToxic(c, n){
+  for(let i = 0; i < n; i++) particle('itToxic', c.x + rnd(-60,60), c.y + rnd(-50,50), rnd(-50,50), -rnd(30,90), 1000 + rnd(0,400), rnd(70,110));
+}
+function itHitFx(c, big){
+  restart($('#arena'), 'quake');
+  restart($('#fP'), 'hurt');
+  particle('flash', c.x, c.y, 0, 0, 340, big ? 240 : 180);
+  shockRing(c, 'rgba(163,230,53,.95)');
+  setTimeout(() => shockRing(c, 'rgba(239,68,68,.85)'), 100);
+  impactFx($('#fP'), 'spark');
+  dustBig(c, 5);
+  itToxic(c, 3);
+  smokeAt($('#fP'), 230);
+}
+
+function itScream(pend){
+  playSnd('tsScream', TS_SCREAM, 1.5);
+  const fe = $('#fE'), ar = $('#arena');
+  restart(fe, 'jit');
+  ar.classList.remove('scream'); void ar.offsetWidth; ar.classList.add('scream');
+  setTimeout(() => ar.classList.remove('scream'), 1050);
+  const a = itSrc();
+  particle('flash', a.x, a.y, 0, 0, 300, 160);
+  shockRing(a, 'rgba(163,230,53,.9)');
+  for(let k = 0; k < 4; k++) setTimeout(() => {
+    if(over) return;
+    const s = itSrc(), b = center($('#fP'));
+    const w = document.createElement('div'); w.className = 'tsBlurWave';
+    document.body.appendChild(w);
+    w.animate([
+      { transform:`translate(${s.x}px,${s.y}px) scale(.4) rotate(225deg)`, opacity:.95 },
+      { transform:`translate(${b.x}px,${b.y}px) scale(2) rotate(225deg)`, opacity:.15 }
+    ], { duration:620, easing:'ease-in', fill:'forwards' });
+    setTimeout(() => w.remove(), 660);
+    particle('puff', s.x, s.y, -rnd(40,120), rnd(-30,30), 700, rnd(70,110));
+  }, 120 + k * 130);
+  setTimeout(() => {
+    if(over || pend.cancelled) return;
+    pend.landed = true;
+    const c = center($('#fP'));
+    itHitFx(c, false);
+    damagePlayer(rnd(1890, 2250), '#ffffff');
+  }, 760);
+}
+
+function itSlap(pend){
+  const fe = $('#fE');
+  restart(fe, 'jit');
+  setTimeout(() => {
+    if(over) return;
+    const a = center(fe), b = center($('#fP'));
+    const dx = (b.x - a.x) * 0.5;
+    fe.animate([
+      { transform:'translate(0,0) rotate(0deg)' },
+      { transform:`translate(${dx}px,-10px) rotate(-8deg)`, offset:.4 },
+      { transform:'translate(0,0) rotate(0deg)' }
+    ], { duration:520, easing:'ease-out' });
+    setTimeout(() => {
+      if(over || pend.cancelled) return;
+      pend.landed = true;
+      playSnd('tsSlap', TS_SLAP, 1.5);
+      const c = center($('#fP'));
+      itHitFx(c, true);
+      for(let i = 0; i < 4; i++) arcFly('stone', { x:c.x + rnd(-30,30), y:c.y + rnd(-30,30) }, { x:c.x + rnd(-200,200), y:c.y + rnd(60,150) }, 600 + rnd(0,200), rnd(70,150), null);
+      for(let i = 0; i < 6; i++) particle('shard', c.x + rnd(-30,30), c.y + rnd(-30,30), rnd(-140,140), rnd(-120,50), 600 + rnd(0,300));
+      damagePlayer(rnd(1740, 1950), '#fb923c');
+    }, 210);
+  }, 260);
+}
+
+function itBullet(dmg, first){
+  const fe = $('#fE');
+  playSnd('tsShoot', TS_SHOOT, 1.5);
+  restart(fe, 'jit');
+  if(first) redFlash();
+  const a = itSrc(), b = center($('#fP'));
+  particle('flash', a.x, a.y, 0, 0, 260, 150);
+  shockRing(a, 'rgba(239,68,68,.95)');
+  for(let i = 0; i < 4; i++) particle('fire', a.x + rnd(-15,15), a.y + rnd(-15,15), -rnd(10,100), rnd(-50,50), 500, rnd(22,40));
+  particle('dsmoke', a.x, a.y, -rnd(20,60), -rnd(20,60), 900, 100);
+  const el = document.createElement('div'); el.className = 'tsBullet itBullet';
+  document.body.appendChild(el);
+  const dur = 520, kf = [];
+  for(let i = 0; i <= 12; i++){
+    const t = i / 12, p = bez(a, b, 40, t), q = bez(a, b, 40, Math.min(1, t + 0.02));
+    kf.push({ transform:`translate(${p.x}px,${p.y}px) rotate(${Math.atan2(q.y - p.y, q.x - p.x) * 180 / Math.PI}deg)`, offset:t });
+  }
+  const t0 = performance.now();
+  const iv = setInterval(() => {
+    const t = Math.min(1, (performance.now() - t0) / dur), p = bez(a, b, 40, t);
+    particle('tsRedWave', p.x, p.y, rnd(-12,12), rnd(-12,12), 420, rnd(70,100));
+    particle('fire', p.x, p.y, rnd(-20,20), rnd(-20,20), 480, rnd(24,40));
+    if(t >= 1) clearInterval(iv);
+  }, 55);
+  el.animate(kf, { duration:dur, easing:'linear', fill:'forwards' }).onfinish = () => {
+    el.remove(); clearInterval(iv);
+    if(over) return;
+    playSnd('tsExpl', TS_EXPL, 1.5);
+    const c = center($('#fP'));
+    itHitFx(c, true);
+    for(let i = 0; i < 7; i++) particle('fire', c.x + rnd(-40,40), c.y + rnd(-40,40), rnd(-120,120), rnd(-130,30), 650 + rnd(0,300), rnd(30,56));
+    for(let i = 0; i < 5; i++) particle('dsmoke', c.x + rnd(-60,60), c.y + rnd(-50,50), rnd(-70,70), -rnd(40,110), 1200 + rnd(0,600), rnd(90,110));
+    for(let i = 0; i < 6; i++) particle(i % 2 ? 'bzSpark' : 'bzSlEmber', c.x + rnd(-30,30), c.y + rnd(-30,30), rnd(-150,150), rnd(-150,50), 550 + rnd(0,300));
+    damagePlayer(dmg, '#ef4444');
+  };
+}
+function itBarrage(){
+  playSnd('tsRage', TS_RAGE, 1.5);
+  const c = center($('#fE'));
+  shockRing(c, 'rgba(255,23,68,.95)');
+  setAura($('#eaura'), 'red');
+  let n = 0;
+  const fire = () => { if(over) return; n++; itBullet(600, false); };
+  fire();
+  const iv = setInterval(() => { if(over || n >= 4){ clearInterval(iv); return; } fire(); }, 800);
+  setTimeout(() => { if(!over) setAura($('#eaura'), null); }, 3400);
+}
+
+function itJet(){
+  const r = $('#fE').getBoundingClientRect();
+  const x = r.left + r.width * 0.85, y = r.top + r.height * 0.55;
+  particle('fire', x + rnd(-10,10), y + rnd(-15,15), rnd(40,110), rnd(-30,30), 520, rnd(30,52));
+  particle('dsmoke', x + rnd(-10,10), y + rnd(-15,15), rnd(40,120), rnd(-40,20), 1000, rnd(80,110));
+  particle('bzSpark', x, y, rnd(50,130), rnd(-60,60), 420);
+}
+function itDash(pend){
+  const fe = $('#fE'), fp = $('#fP');
+  E.itDashAt = Infinity;
+  sfx.boost();
+  restart(fe, 'jit');
+  const c0 = center(fe);
+  shockRing(c0, 'rgba(163,230,53,.9)');
+  particle('flash', c0.x, c0.y, 0, 0, 280, 150);
+  const chIv = setInterval(itJet, 50);
+  setTimeout(() => {
+    clearInterval(chIv);
+    if(over) return;
+    const fr = fe.getBoundingClientRect(), pr = fp.getBoundingClientRect();
+    const a = center(fe), b = center(fp);
+    const dx = Math.min(-60, pr.left + pr.width * 0.88 - (fr.left + fr.width * 0.1));
+    const dy = (b.y - a.y) * 0.7;
+    const an = fe.animate([
+      { transform:'translate(0,0) rotate(0deg)' },
+      { transform:`translate(${dx}px,${dy}px) rotate(-12deg)` }
+    ], { duration:500, easing:'cubic-bezier(.6,0,.9,.5)', fill:'forwards' });
+    E.itAnims.push(an);
+    const iv = setInterval(() => { if(over){ clearInterval(iv); return; } itJet(); }, 45);
+    an.onfinish = () => {
+      clearInterval(iv);
+      if(over) return;
+      if(!pend.cancelled){
+        pend.landed = true;
+        sfx.crush(); sfx.hit();
+        const c = center(fp);
+        itHitFx(c, true);
+        for(let i = 0; i < 6; i++) particle('shard', c.x + rnd(-30,30), c.y + rnd(-30,30), rnd(-140,140), rnd(-120,50), 600 + rnd(0,300));
+        floatText(fp, 'STUN', '#fde047');
+        damagePlayer(1000, '#fb923c');
+        P.noAttackUntil = Date.now() + 20000;
+        hideAbilities();
+        fp.classList.add('tremble');
+        setTimeout(() => fp.classList.remove('tremble'), 20000);
+      }
+      setTimeout(() => {
+        if(over) return;
+        const an2 = fe.animate([
+          { transform:`translate(${dx}px,${dy}px) rotate(-12deg)` },
+          { transform:'translate(0,0) rotate(0deg)' }
+        ], { duration:650, easing:'ease-in-out', fill:'forwards' });
+        E.itAnims.push(an2);
+        const iv2 = setInterval(() => { if(over){ clearInterval(iv2); return; } itJet(); }, 50);
+        an2.onfinish = () => {
+          clearInterval(iv2);
+          try{ an.cancel(); an2.cancel(); }catch(e){}
+          E.itDashAt = Date.now() + 30000;
+        };
+      }, 380);
+    };
+  }, 380);
+}
+
+function itAttack(){
+  if(over || !E || !E.d.it) return;
+  if(stunned()){ scheduleEnemy(E.stunUntil - Date.now() + 50); return; }
+  if(E.pauseUntil && Date.now() < E.pauseUntil){ scheduleEnemy(E.pauseUntil - Date.now() + 50); return; }
+  scheduleEnemy(E.d.headCd);
+  const pend = { cancelled:false, landed:false };
+  E.pending = pend;
+  const opts = ['scream', 'slap', 'shoot'];
+  if(E.itBarrageOk) opts.push('barrage');
+  if(Date.now() >= (E.itDashAt || 0)) opts.push('dash');
+  const pick = opts[rnd(0, opts.length - 1)];
+  if(pick === 'scream') itScream(pend);
+  else if(pick === 'slap') itSlap(pend);
+  else if(pick === 'shoot'){ E.itBarrageOk = true; itBullet(rnd(1567, 1981), true); }
+  else if(pick === 'barrage'){ E.itBarrageOk = false; itBarrage(); }
+  else itDash(pend);
+}
+
+const _enemyAttackIT = enemyAttack;
+enemyAttack = function(){
+  if(!over && E && E.d && E.d.it) return itAttack();
+  return _enemyAttackIT.apply(this, arguments);
+};
+
+const _endFightIT = endFight;
+endFight = function(){
+  if(E && E.itAnims) E.itAnims.forEach(a => { try{ a.cancel(); }catch(e){} });
+  return _endFightIT.apply(this, arguments);
+};
+
+const _startFightIT = startFight;
+startFight = function(){
+  if(!sel.char || !sel.enemy) return;
+  const isIT = !!A.enemies[sel.enemy].it;
+  const r = _startFightIT.apply(this, arguments);
+  if(!E) return r;
+  E.itBarrageOk = false; E.itDashAt = 0; E.itAnims = [];
+  const ew = $('#eWrap'), fe = $('#fE');
+  if(isIT){
+    ew.style.right = '-9vw';
+    ew.style.bottom = '10%';
+    ew.style.width = 'min(72vw,640px)';
+    fe.style.maxHeight = '78vh';
+    /* своя музыка на уже разбуженном плеере пвп */
+    pvpAudio.src = IT_THEME;
+    pvpAudio.loop = true;
+    pvpAudio.volume = 0.8;
+    pvpAudio.play().catch(() => {});
+  }
+  return r;
+};/* ===== МУЗЫКА: предзагрузка целиком + один надёжный канал ===== */
+function musMsg(t){
+  const d = document.createElement('div');
+  d.textContent = t;
+  d.style.cssText = 'position:fixed;left:50%;bottom:14px;transform:translateX(-50%);background:#000;color:#fca5a5;border:1px solid #fff;padding:8px 12px;font:700 13px sans-serif;z-index:300;max-width:90vw;text-align:center';
+  document.body.appendChild(d);
+  setTimeout(() => d.remove(), 7000);
+}
+const MUS = {};
+function musLoad(key, url){
+  if(MUS[key]) return MUS[key].p;
+  const o = MUS[key] = {};
+  o.p = fetch(url).then(r => {
+    if(!r.ok) throw new Error('HTTP ' + r.status);
+    return r.blob();
+  }).then(b => {
+    o.blob = b; o.url = URL.createObjectURL(b);
+    return o;
+  }).catch(e => {
+    o.err = String(e);
+    musMsg('Музыка ' + key + ' не загрузилась: ' + o.err);
+    return o;
+  });
+  return o.p;
+}
+musLoad('it', IT_THEME);
+musLoad('ts', TS_THEME);
+
+/* отключаем все старые попытки музыки Титана */
+tsMusicStart = function(){};
+tsMusicGuard = function(){};
+tsOn = false;
+tsWant = false;
+try{ tsStopWA(); }catch(e){}
+
+/* музыка твоего Титана через Web Audio (играет вместе с пвп-музыкой) */
+let tsBuf2 = null, tsSrc2 = null, tsG2 = null, tsWant2 = false;
+function tsDecode(){
+  return musLoad('ts', TS_THEME).then(o => {
+    if(!o.blob || tsBuf2) return;
+    return o.blob.arrayBuffer()
+      .then(b => ctx().decodeAudioData(b))
+      .then(buf => { tsBuf2 = buf; })
+      .catch(e => musMsg('Титан: музыка не декодировалась: ' + e));
+  });
+}
+function tsPlay2(){
+  if(!tsWant2 || over || !tsBuf2 || tsSrc2) return;
+  const c = ctx();
+  if(c.state !== 'running') c.resume().catch(() => {});
+  tsG2 = c.createGain(); tsG2.gain.value = 0.9;
+  tsSrc2 = c.createBufferSource();
+  tsSrc2.buffer = tsBuf2; tsSrc2.loop = true;
+  tsSrc2.connect(tsG2).connect(c.destination);
+  tsSrc2.start();
+}
+function tsStop2(){
+  tsWant2 = false;
+  if(tsSrc2){ try{ tsSrc2.stop(); }catch(e){} tsSrc2 = null; }
+  if(tsG2){ try{ tsG2.disconnect(); }catch(e){} tsG2 = null; }
+}
+tsDecode();
+setInterval(() => {
+  if(!tsWant2 || over) return;
+  const c = ctx();
+  if(c.state !== 'running') c.resume().catch(() => {});
+  if(tsBuf2 && !tsSrc2) tsPlay2();
+}, 1000);
+
+const _endFightMus = endFight;
+endFight = function(){
+  tsStop2();
+  return _endFightMus.apply(this, arguments);
+};
+
+const _startFightMus = startFight;
+startFight = function(){
+  if(!sel.char || !sel.enemy) return;
+  const isTS = sel.char === TS_KEY;
+  const isIT = !!A.enemies[sel.enemy].it;
+  tsStop2();
+  const r = _startFightMus.apply(this, arguments);
+  /* твой Титан */
+  if(isTS){
+    tsWant2 = true;
+    if(tsBuf2) tsPlay2();
+    else tsDecode().then(tsPlay2);
+  }
+  /* InfectedTitanSpeakerHare: заменяем пвп-музыку на его мелодию из памяти */
+  if(isIT){
+    const o = MUS.it || {};
+    pvpAudio.onerror = () => musMsg('Мелодия Инфицированного не играет, код: ' + (pvpAudio.error ? pvpAudio.error.code : '?'));
+    pvpAudio.src = o.url || IT_THEME;
+    pvpAudio.loop = true;
+    pvpAudio.volume = 0.8;
+    const p = pvpAudio.play();
+    if(p && p.catch) p.catch(e => musMsg('Мелодия Инфицированного заблокирована: ' + (e && e.name)));
+  } else {
+    pvpAudio.onerror = null;
+  }
+  return r;
+};
+</script>
+</body>
+</html>
